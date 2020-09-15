@@ -1,0 +1,33 @@
+﻿@model  List<Cliente>
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Cliente</h1>
+</div>
+
+<p>Clientes cadastrados: @(Model.Count())</p>
+<div class="row">
+    <div class="col-6">
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Endereco</th>
+                <th>Telefone</th>
+            </tr>
+            @foreach (var cliente in Model)
+            {
+                <tr>
+                    <td>@cliente.Id</td>
+                    <td>@cliente.Nome</td>
+                    <td>@cliente.Email</td>
+                    <td>@cliente.Endereco</td>
+                    <td>@cliente.Telefone</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
