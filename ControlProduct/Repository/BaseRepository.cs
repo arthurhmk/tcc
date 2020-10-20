@@ -24,5 +24,23 @@ namespace ControlProduct.Repository
         {
             return await Entity.FromSqlRaw(query, args).ToListAsync();
         }
+
+        public async Task Insert(TEntity entity)
+        {
+            Entity.Add(entity);
+            Context.SaveChanges();
+        }
+
+        public async Task Update(TEntity entity)
+        {
+            Entity.Update(entity);
+            Context.SaveChanges();
+        }
+
+        public async Task Delete(TEntity entity)
+        {
+            Entity.Remove(entity);
+            Context.SaveChanges();
+        }
     }
 }

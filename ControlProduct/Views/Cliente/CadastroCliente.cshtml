@@ -10,6 +10,8 @@
 <div class="row">
     <div class="col-6">
         <form asp-action="CadastroCliente" method="post">
+            <input type="hidden" asp-for="Id" />
+
             <div class="form-group">
                 <label asp-for="Nome"></label>
                 <input asp-for="Nome" class="form-control" /><br />
@@ -25,7 +27,16 @@
                 <input asp-for="Telefone" class="form-control" /><br />
             </div>
 
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <div class="form-group">
+                <label asp-for="Endereco"></label>
+                <input asp-for="Endereco" class="form-control" /><br />
+            </div>
+
+            <button type="submit" class="btn btn-primary">@(Model.Id!=0?"Atualizar":"Cadastrar")</button>
+            @if (Model.Id != 0)
+            {
+            <a asp-action="RemoverCliente" asp-route-idCliente="@Model.Id" class="btn btn-danger">Excluir</a>
+            }
         </form>
     </div>
 </div>

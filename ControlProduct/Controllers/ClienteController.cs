@@ -24,32 +24,53 @@ namespace ControlProduct.Controllers
         }
 
         [Route("")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var clientes =  _repoCliente.Entity.AsNoTracking().OrderBy(p=> p.Id).ToList();
+            var clientes =  await _repoCliente.Entity.AsNoTracking().OrderBy(p=> p.Id).ToListAsync();
             return View(clientes);
         }
 
         [Route("novo-cliente")]
-        public IActionResult CadastroCliente()
+        public async Task<IActionResult> CadastroCliente(int? idCliente)
         {
+            if(idCliente != null)
+            {
+                var cliente = await _repoCliente.Entity.FindAsync(idCliente);
+                if (cliente != null)
+                    return View(cliente);
+            }
             return View(new Cliente());
         }
 
         [HttpPost]
         [Route("novo-cliente")]
-        public IActionResult CadastroCliente(Cliente cliente)
+        public async Task<IActionResult> CadastroCliente(Cliente cliente)
         {
             if (ModelState.IsValid)
             {
-                _repoCliente.Entity.Add(cliente);
-                _repoCliente.Context.SaveChanges();
+                if (cliente.Id != 0)
+                    await _repoCliente.Update(cliente);
+                else
+                    await _repoCliente.Insert(cliente);
                 return RedirectToAction(nameof(Index));
             }
-            else
+
+            throw new Exception("Cliente inválido");
+        }
+
+        [Route("remover-cliente")]
+        public async Task<IActionResult> RemoverCliente(int? idCliente)
+        {
+            if (idCliente != null)
             {
-                throw new Exception("Cliente inválido");
+                var cliente = await _repoCliente.Entity.FindAsync(idCliente);
+                if (cliente != null)
+                {
+                    await _repoCliente.Delete(cliente);
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            throw new Exception("Cliente inválido");
         }
     }
 }

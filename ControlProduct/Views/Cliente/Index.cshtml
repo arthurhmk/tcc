@@ -22,7 +22,7 @@
             @foreach (var cliente in Model)
             {
                 <tr>
-                    <td>@cliente.Id</td>
+                    <td><a asp-action="CadastroCliente" asp-route-idCliente="@cliente.Id">@cliente.Id</a></td>
                     <td>@cliente.Nome</td>
                     <td>@cliente.Email</td>
                     <td>@cliente.Endereco</td>
