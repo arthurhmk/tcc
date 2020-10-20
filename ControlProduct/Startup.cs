@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ControlProduct.Controllers.Common;
 using ControlProduct.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +33,7 @@ namespace ControlProduct
             services.AddDbContext<BaseContext>(options => options.UseSqlServer(connectionString));
 
             services.AddScoped(typeof(BaseRepository<>));
+            services.AddScoped(typeof(BaseServices));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
