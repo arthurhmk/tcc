@@ -1,4 +1,4 @@
-﻿CREATE SCHEMA ControlProduct;
+﻿-- CREATE SCHEMA ControlProduct;
 
 -- -----------------------------------------------------
 -- Table cliente

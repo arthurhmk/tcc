@@ -1,0 +1,30 @@
+﻿@model  List<Categoria>
+@{
+    ViewData["Title"] = "Categorias";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Categoria</h1>
+</div>
+
+<p>Categorias cadastrados: @(Model.Count())</p>
+<a asp-action="CadastroCategoria">Nova Categoria</a>
+<div class="row">
+    <div class="col-6">
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Super Categoria</th>
+            </tr>
+            @foreach (var categoria in Model)
+            {
+                <tr>
+                    <td><a asp-action="CadastroCategoria" asp-route-idCategoria="@categoria.Id">@categoria.Id</a></td>
+                    <td>@categoria.Nome</td>
+                    <td>@categoria.SuperCategoria?.Nome</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

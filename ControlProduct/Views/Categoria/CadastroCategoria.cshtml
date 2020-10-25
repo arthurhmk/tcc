@@ -1,0 +1,52 @@
+﻿@model  Categoria
+@{
+    ViewData["Title"] = "Novo Categoria";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Categoria</h1>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <form asp-action="CadastroCategoria" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="Nome"></label>
+                <input asp-for="Nome" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="SuperCategoriaId"></label>
+                <select id="SuperCategoriaId" name="SuperCategoriaId" class="form-control">
+                    <option></option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">@(Model.Id!=0?"Atualizar":"Cadastrar")</button>
+            @if (Model.Id != 0)
+            {
+            <a asp-action="RemoverCategoria" asp-route-idCategoria="@Model.Id" class="btn btn-danger">Excluir</a>
+            }
+        </form>
+    </div>
+</div>
+
+<script>
+    window.addEventListener("load", function () {
+        $.ajax({
+            url: "buscar-super-categorias",
+            method: "post",
+            data: {
+                idCategoria: @Model.Id
+            }
+        })
+        .done(function( data ) {
+            console.log(data);
+            data.forEach(function (obj) {
+                $("#SuperCategoriaId").append(`<option value='${obj.id}'>${obj.nome}</option>`);
+            })
+        });
+    });
+</script>
