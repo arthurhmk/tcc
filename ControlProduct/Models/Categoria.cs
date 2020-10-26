@@ -16,5 +16,7 @@ namespace ControlProduct.Models
 
         public Categoria SuperCategoria { get; set; }
         public ICollection<Categoria> SubCategorias { get; set; }
+
+        public ICollection<Produto> Produtos { get; set; }
     }
 }

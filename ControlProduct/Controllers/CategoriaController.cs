@@ -100,5 +100,19 @@ namespace ControlProduct.Controllers
             }
             throw new Exception("Id inválido");
         }
+
+        [HttpPost]
+        [Route("buscar-categorias")]
+        public async Task<IActionResult> BuscarCategorias(int? idCategoria)
+        {
+            var categorias = (await _repoCategoria.Entity.AsNoTracking()
+                    .Where(p=> idCategoria == null || idCategoria != p.Id)
+                    .OrderBy(p => p.Id)
+                    //.Skip(0).Take(20)
+                    .ToListAsync())
+                .Select(p => new CategoriaViewModel(p));
+
+            return Json(categorias);
+        }
     }
 }

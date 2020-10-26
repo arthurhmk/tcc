@@ -1,0 +1,46 @@
+﻿@model  List<Produto>
+@{
+    ViewData["Title"] = "Produtos";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Produto</h1>
+</div>
+
+<p>Produtos cadastrados: @(Model.Count())</p>
+<a asp-action="CadastroProduto">Novo Produto</a>
+<div class="row">
+    <div class="col-6">
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th>Categoria</th>
+                <th>Nome</th>
+                <th>Preço</th>
+                <th>Quantidade</th>
+                <th>Estado</th>
+            </tr>
+            @foreach (var produto in Model)
+            {
+                <tr>
+                    <td><a asp-action="CadastroProduto" asp-route-idProduto="@produto.Id">@produto.Id</a></td>
+                    <td>@produto.Categoria?.Nome</td>
+                    <td>@produto.Nome</td>
+                    <td>@produto.Valor</td>
+                    <td>@produto.Quantidade</td>
+                    <td>
+                        @switch (produto.Ativo)
+                        {
+                            case ControlProduct.Models.Enum.EstadoProduto.ATIVO:
+                                <span class="text-success">Ativo</span>
+                                break;
+                            case ControlProduct.Models.Enum.EstadoProduto.INATIVO:
+                                <span class="text-warning">Inativo</span>
+                                break;
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

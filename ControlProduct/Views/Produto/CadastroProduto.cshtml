@@ -1,0 +1,75 @@
+﻿@model Produto
+@{
+    ViewData["Title"] = "Novo Produto";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Produto</h1>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <form asp-action="CadastroProduto" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="Nome"></label>
+                <input asp-for="Nome" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Valor"></label>
+                <input asp-for="Valor" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Quantidade"></label>
+                <input asp-for="Quantidade" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                @{
+                    var selectlist = Html.GetEnumSelectList<ControlProduct.Models.Enum.EstadoProduto>().ToList();
+                }
+                <label asp-for="Ativo"></label>
+                <select id="Ativo" name="Ativo" asp-items="selectlist" class="form-control">
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="CategoriaId"></label>
+                <select id="CategoriaId" name="CategoriaId" class="form-control">
+                    <option value=""></option>
+                    @if (Model.CategoriaId != 0)
+                    {
+                        <option value="@Model.CategoriaId" selected>@Model.Categoria.Nome</option>
+                    }
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">@(Model.Id != 0 ? "Atualizar" : "Cadastrar")</button>
+            @if (Model.Id != 0)
+            {
+                <a asp-action="RemoverProduto" asp-route-idProduto="@Model.Id" class="btn btn-danger">Excluir</a>
+            }
+        </form>
+    </div>
+</div>
+
+<script>
+    window.addEventListener("load", function () {
+        $.ajax({
+            url: "/categoria/buscar-categorias",
+            method: "post"
+            data: {
+                idCategoria: @Model.CategoriaId
+            }
+        })
+        .done(function( data ) {
+            console.log(data);
+            data.forEach(function (obj) {
+                $("#CategoriaId").append(`<option value='${obj.id}'>${obj.nome}</option>`);
+            })
+        });
+    });
+</script>
