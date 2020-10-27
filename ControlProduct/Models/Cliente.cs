@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace ControlProduct.Models
 {
@@ -19,5 +20,7 @@ namespace ControlProduct.Models
 
         [DisplayName("Endereço")]
         public string Endereco { get; set; }
+
+        public List<Pedido> Pedidos { get; set; }
     }
 }

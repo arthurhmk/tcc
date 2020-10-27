@@ -127,11 +127,11 @@ CREATE TABLE ControlProduct.pedido_produto (
 ;
 
 -- -----------------------------------------------------
--- Table debito
+-- Table debito TODO: ALTERAR POR UM VIEW
 -- -----------------------------------------------------
-CREATE TABLE ControlProduct.debito (
-  cd_debito INT NOT NULL IDENTITY(1,1),
-  dt_debito DATE NOT NULL,
-  vl_debito DECIMAL(10,2) NOT NULL,
-  PRIMARY KEY (cd_debito))
-;
+--CREATE TABLE ControlProduct.debito (
+--  cd_debito INT NOT NULL IDENTITY(1,1),
+--  dt_debito DATE NOT NULL,
+--  vl_debito DECIMAL(10,2) NOT NULL,
+--  PRIMARY KEY (cd_debito))
+--;

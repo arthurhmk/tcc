@@ -27,5 +27,7 @@ namespace ControlProduct.Models
         public EstadoProduto Ativo { get; set; }
 
         public Categoria Categoria { get; set; }
+
+        public List<PedidoProduto> PedidoProdutos { get; set; }
     }
 }

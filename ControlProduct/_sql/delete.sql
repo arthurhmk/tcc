@@ -1,4 +1,4 @@
-﻿DROP TABLE ControlProduct.debito;
+﻿--DROP TABLE ControlProduct.debito;
 DROP TABLE ControlProduct.pedido_produto;
 DROP TABLE ControlProduct.produto;
 DROP TABLE ControlProduct.categoria;
