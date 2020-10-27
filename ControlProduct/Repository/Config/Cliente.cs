@@ -34,6 +34,10 @@ namespace ControlProduct.Repository.Config
                 .Property(p => p.Telefone)
                 .HasColumnName("ds_telefone")
                 .HasMaxLength(60);
+
+
+            builder
+                .HasMany(p => p.Pedidos).WithOne(p => p.Cliente).HasForeignKey(p => p.IdCliente);
         }
     }
 }

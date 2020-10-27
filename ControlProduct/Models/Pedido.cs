@@ -10,15 +10,15 @@ namespace ControlProduct.Models
     {
         public int Id { get; set; }
 
-        public int ClienteId { get; set; }
+        public int IdCliente { get; set; }
 
         public double Valor { get; set; }
 
-        public EstadoProduto Estado { get; set; }
+        public EstadoPedido Estado { get; set; }
 
-        public DateTime Inicio { get; set; }
+        public DateTime DataPedido{ get; set; }
 
-        public DateTime Entrega { get; set; }
+        public DateTime? DataEntrega { get; set; }
 
         public TipoEntrega Tipo { get; set; }
 
@@ -29,6 +29,7 @@ namespace ControlProduct.Models
         public Cliente Cliente { get; set; }
 
         public List<PedidoProduto> PedidoProdutos { get; set; }
-        public List<Pagamento> Pagamento { get; set; }
+        public List<Pagamento> Pagamentos { get; set; }
+        public List<PedidoExtra> Extras { get; set; }
     }
 }

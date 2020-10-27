@@ -47,6 +47,9 @@ namespace ControlProduct.Repository.Config
 
             builder
                 .HasOne(p => p.Categoria).WithMany(p => p.Produtos).HasForeignKey(p => p.CategoriaId);
+
+            builder
+                .HasMany(p => p.PedidoProdutos).WithOne(p => p.Produto).HasForeignKey(p => p.IdProduto);
         }
     }
 }
