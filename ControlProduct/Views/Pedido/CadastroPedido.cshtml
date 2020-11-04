@@ -1,0 +1,82 @@
+﻿@model  Pedido
+@{
+    ViewData["Title"] = "Novo Pedido";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Pedido</h1>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <form asp-action="CadastroPedido" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="Valor"></label>
+                <input asp-for="Valor" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="IdCliente"></label>
+                <select id="IdCliente" name="IdCliente" class="form-control">
+                </select>
+            </div>
+
+            <div class="form-group">
+                @{
+                    var selectlist = Html.GetEnumSelectList<ControlProduct.Models.Enum.TipoEntrega>().ToList();
+                }
+                <label asp-for="TipoEntrega"></label>
+                <select id="TipoEntrega" name="TipoEntrega" asp-items="selectlist" class="form-control">
+                </select>
+            </div>
+
+            <div id="formularioEntrega" class="mb-4">
+                <div class="form-group">
+                    <label asp-for="EnderecoEntrega"></label>
+                    <input asp-for="EnderecoEntrega" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ValorEntrega"></label>
+                    <input asp-for="ValorEntrega" class="form-control" />
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">@(Model.Id != 0 ? "Atualizar" : "Cadastrar")</button>
+            @if (Model.Id != 0)
+            {
+                <a asp-action="RemoverCategoria" asp-route-idCategoria="@Model.Id" class="btn btn-danger">Excluir</a>
+            }
+        </form>
+    </div>
+</div>
+
+<script>
+    window.addEventListener("load", function () {
+        $.ajax({
+            url: "/cliente/buscar-clientes",
+            method: "post"
+        })
+        .done(function( data ) {
+            console.log(data);
+            data.forEach(function (obj) {
+                $("#IdCliente").append(`<option value='${obj.id}'>${obj.nome}</option>`);
+            })
+        });
+
+        var formularioEntrega = $("#formularioEntrega *");
+        formularioEntrega.remove();
+        $("#TipoEntrega").change(function () {
+            console.log("A");
+            if (String.fromCharCode($(this).val()) == 'E') {
+                console.log("E");
+                $("#formularioEntrega").append(formularioEntrega);
+            }
+            else {
+                formularioEntrega.remove();
+            }
+        });
+    });
+</script>

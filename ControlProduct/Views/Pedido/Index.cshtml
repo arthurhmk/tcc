@@ -1,0 +1,42 @@
+﻿@model  List<Pedido>
+@{
+    ViewData["Title"] = "Pedidos";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Pedidos</h1>
+</div>
+
+<p>Pedidos cadastrados: @(Model.Count())</p>
+<a asp-action="CadastroPedido">Novo Pedido</a>
+<div class="row">
+    <div class="col-6">
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th>Cliente</th>
+                <th>Valor</th>
+                <th>Estado do pedido</th>
+                <th>Data do pedido</th>
+                <th>Data de entrega</th>
+                <th>Tipo de entrega</th>
+                <th>Endereço de entrega</th>
+                <th>Valor de entrega</th>
+            </tr>
+            @foreach (var pedido in Model)
+            {
+                <tr>
+                    <td><a asp-action="CadastroPedido" asp-route-idCategoria="@pedido.Id">@pedido.Id</a></td>
+                    <td>@pedido.Cliente.Nome</td>
+                    <td>@pedido.Valor</td>
+                    <td>@pedido.Estado</td>
+                    <td>@pedido.DataPedido</td>
+                    <td>@pedido.DataEntrega</td>
+                    <td>@pedido.TipoEntrega</td>
+                    <td>@pedido.EnderecoEntrega</td>
+                    <td>@pedido.ValorEntrega</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

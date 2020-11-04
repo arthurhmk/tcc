@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ControlProduct.Controllers.Common;
 using ControlProduct.Models;
+using ControlProduct.Models.ViewModel;
 using ControlProduct.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +72,14 @@ namespace ControlProduct.Controllers
                 }
             }
             throw new Exception("Cliente inválido");
+        }
+
+        [HttpPost]
+        [Route("buscar-clientes")]
+        public async Task<IActionResult> BuscarClientes()
+        {
+            var clientes = (await _repoCliente.Entity.AsNoTracking().ToListAsync()).Select(p=> new ClienteViewModel(p));
+            return Json(clientes);
         }
     }
 }

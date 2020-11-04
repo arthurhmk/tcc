@@ -45,19 +45,15 @@ namespace ControlProduct.Repository.Config
                 .HasColumnName("dt_entrega");
 
             builder
-                .Property(p => p.DataEntrega)
-                .HasColumnName("dt_entrega");
-
-            builder
-                .Property(p => p.Tipo)
-                .HasColumnName("ic_status_pedido")
+                .Property(p => p.TipoEntrega)
+                .HasColumnName("ic_tipo_entrega")
                 .HasConversion(
                     p => (char)p,
                     p => (TipoEntrega)p
                 );
 
             builder
-                .Property(p => p.DataEntrega)
+                .Property(p => p.EnderecoEntrega)
                 .HasMaxLength(100)
                 .HasColumnName("ds_endereco_entrega");
 

@@ -20,7 +20,7 @@ namespace ControlProduct.Models
 
         public DateTime? DataEntrega { get; set; }
 
-        public TipoEntrega Tipo { get; set; }
+        public TipoEntrega TipoEntrega { get; set; }
 
         public string EnderecoEntrega { get; set; }
 
