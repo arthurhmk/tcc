@@ -23,6 +23,10 @@ namespace ControlProduct.Repository.Config
                 .HasColumnName("cd_pedido");
 
             builder
+                .Property(p => p.Quantidade)
+                .HasColumnName("qt_produto");
+
+            builder
                 .HasOne(p => p.Produto).WithMany(p => p.PedidoProdutos).HasForeignKey(p => p.IdProduto);
 
             builder

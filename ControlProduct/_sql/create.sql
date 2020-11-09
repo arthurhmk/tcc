@@ -114,6 +114,7 @@ CREATE TABLE ControlProduct.produto (
 CREATE TABLE ControlProduct.pedido_produto (
   cd_produto INT NULL,
   cd_pedido INT NULL,
+  qt_produto INT NOT NULL DEFAULT 1,
   CONSTRAINT FK_PEDIDO
     FOREIGN KEY (cd_produto)
     REFERENCES ControlProduct.produto (cd_produto)

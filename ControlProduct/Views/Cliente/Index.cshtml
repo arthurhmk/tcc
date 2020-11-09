@@ -11,24 +11,28 @@
 <a asp-action="CadastroCliente">Novo Cliente</a>
 <div class="row">
     <div class="col-6">
-        <table class="table">
-            <tr>
-                <th>Id</th>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Endereco</th>
-                <th>Telefone</th>
-            </tr>
-            @foreach (var cliente in Model)
-            {
+        <table class="datatable-cliente table">
+            <thead>
                 <tr>
-                    <td><a asp-action="CadastroCliente" asp-route-idCliente="@cliente.Id">@cliente.Id</a></td>
-                    <td>@cliente.Nome</td>
-                    <td>@cliente.Email</td>
-                    <td>@cliente.Endereco</td>
-                    <td>@cliente.Telefone</td>
+                    <th>Id</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Endereco</th>
+                    <th>Telefone</th>
                 </tr>
-            }
+            </thead>
+            <tbody>
+                @foreach (var cliente in Model)
+                {
+                    <tr>
+                        <td><a asp-action="CadastroCliente" asp-route-idCliente="@cliente.Id">@cliente.Id</a></td>
+                        <td>@cliente.Nome</td>
+                        <td>@cliente.Email</td>
+                        <td>@cliente.Endereco</td>
+                        <td>@cliente.Telefone</td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
 </div>

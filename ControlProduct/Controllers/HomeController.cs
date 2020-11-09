@@ -10,7 +10,7 @@ using ControlProduct.Controllers.Common;
 
 namespace ControlProduct.Controllers
 {
-    [Route("")]
+    [Route("OldHome")]
     public class HomeController : BaseController
     {
 

@@ -1,4 +1,5 @@
-﻿@model  List<Pedido>
+﻿@using ControlProduct.Models.ViewModel
+@model List<PedidoViewModel>
 @{
     ViewData["Title"] = "Pedidos";
 }
@@ -8,35 +9,107 @@
 </div>
 
 <p>Pedidos cadastrados: @(Model.Count())</p>
-<a asp-action="CadastroPedido">Novo Pedido</a>
+
+<div class="text-right mb-2">
+    <a class="btn btn-primary" asp-action="CadastroPedido">Novo Pedido</a>
+</div>
+
+
 <div class="row">
-    <div class="col-6">
-        <table class="table">
-            <tr>
-                <th>Id</th>
-                <th>Cliente</th>
-                <th>Valor</th>
-                <th>Estado do pedido</th>
-                <th>Data do pedido</th>
-                <th>Data de entrega</th>
-                <th>Tipo de entrega</th>
-                <th>Endereço de entrega</th>
-                <th>Valor de entrega</th>
-            </tr>
-            @foreach (var pedido in Model)
-            {
+    <div class="col-12">
+        <table class="datatable-pedidos table">
+            <thead>
                 <tr>
-                    <td><a asp-action="CadastroPedido" asp-route-idCategoria="@pedido.Id">@pedido.Id</a></td>
-                    <td>@pedido.Cliente.Nome</td>
-                    <td>@pedido.Valor</td>
-                    <td>@pedido.Estado</td>
-                    <td>@pedido.DataPedido</td>
-                    <td>@pedido.DataEntrega</td>
-                    <td>@pedido.TipoEntrega</td>
-                    <td>@pedido.EnderecoEntrega</td>
-                    <td>@pedido.ValorEntrega</td>
+                    <th>Cliente</th>
+                    <th>Pedido</th>
+                    <th>Valor</th>
+                    <th>Data do pedido</th>
+                    <th>Data de entrega</th>
+                    <th>Local de Entrega</th>
+                    <th>Status</th>
+                    <th>Valor Pago</th>
+                    <th></th>
                 </tr>
-            }
+            </thead>
+            <tbody>
+                @foreach (var pedido in Model)
+                {
+                    <tr>
+                        <td>@pedido.Cliente</td>
+                        <td>
+                            <button class="btn btn-primary">@pedido.Pedido.Count Produto(s)</button>
+                        </td>
+                        <td>@pedido.Valor</td>
+                        <td>@pedido.DataPedido</td>
+                        <td>@pedido.DataEntrega</td>
+                        <td>@pedido.LocalEntrega</td>
+                        <td>@pedido.Status</td>
+                        <td>@pedido.ValorPago</td>
+                        <td>
+                            <a asp-action="CadastroPedido" asp-route-idCliente="@pedido.Id">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    //var DataTableConfig = {
+    //    processing: true,
+    //    serverSide: true,
+    //    serverMethod: "POST",
+    //    ajax: {
+    //        url: "buscar-pedido",
+    //        dataSrc: "data",
+    //        data: function (d) {
+    //            //d.var = "custom"
+    //        }
+    //    },
+    //    columns: [
+    //        { data: "cliente" },
+    //        { data: "pedido" },
+    //        { data: "valor" },
+    //        { data: "dataPedido" },
+    //        { data: "dataEntrega" },
+    //        { data: "localEntrega" },
+    //        { data: "status" },
+    //        { data: "valorPago" },
+    //        { data: "id" }
+    //    ],
+    //    columnDefs: [
+    //        {
+    //            targets: 0,
+    //            render: function (data, type, row, meta) {
+    //                return data;
+    //            }
+    //        },
+    //        {
+    //            targets: 8,
+    //            orderable: false,
+    //            seachable: false,
+    //            render: function (data, type, row, meta) {
+    //                return data;
+    //            }
+    //        }
+    //    ]
+    //}
+    var DataTableConfig = {
+        columnDefs: [
+            {
+                targets: [1, 8],
+                orderable: false,
+                searchable: false
+            }
+        ]
+    }
+</script>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+}

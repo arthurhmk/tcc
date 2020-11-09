@@ -1,0 +1,23 @@
+﻿@model  Tuple<String[], List<List<object>>>
+
+<table class="datatable-generic">
+    <thead>
+        <tr>
+            @foreach (var header in Model.Item1)
+            {
+                <th>@header</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model.Item2)
+        {
+            <tr>
+                @foreach (var col in row)
+                {
+                    <td>@col</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ControlProduct.Controllers
 {
-    [Route("pedido")]
+    [Route("")]
     public class PedidoController : BaseController
     {
         BaseRepository<Pedido> _repoPedido;
@@ -27,8 +27,13 @@ namespace ControlProduct.Controllers
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            var pedidos =  await _repoPedido.Entity.AsNoTracking().Include(p=> p.Cliente).OrderBy(p=> p.Id).ToListAsync();
-            return View(pedidos);
+            var pedidos =  await _repoPedido.Entity.AsNoTracking()
+                .Include(p=> p.Cliente)
+                .Include(p=> p.Pagamentos)
+                .Include(p=> p.PedidoProdutos)
+                .OrderBy(p=> p.Id).ToListAsync();
+            var model = pedidos.Select(p => new PedidoViewModel(p)).ToList();
+            return View(model);
         }
 
         [Route("novo-pedido")]
