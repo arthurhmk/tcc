@@ -1,14 +1,14 @@
-﻿@model  Categoria
+﻿@model Categoria
 @{
     ViewData["Title"] = "Nova Categoria";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Categoria</h1>
+<div class="text-center mb-3">
+    <h1 class="display-4">Cadastro de Categoria</h1>
 </div>
 
-<div class="row">
-    <div class="col-6">
+<div class="row justify-content-md-center">
+    <div class="col-10 border rounded shadow-sm p-3">
         <form asp-action="CadastroCategoria" method="post">
             <input type="hidden" asp-for="Id" />
 
@@ -18,16 +18,13 @@
             </div>
 
             <div class="form-group">
-                <label for="SuperCategoriaId"></label>
-                <select id="SuperCategoriaId" name="SuperCategoriaId" class="form-control">
-                    <option></option>
-                </select>
+                <button class="btn btn-primary">Cadastrar Produtos</button>
             </div>
 
-            <button type="submit" class="btn btn-primary">@(Model.Id!=0?"Atualizar":"Cadastrar")</button>
+            <button type="submit" class="btn btn-primary">@(Model.Id != 0 ? "Atualizar" : "Cadastrar")</button>
             @if (Model.Id != 0)
             {
-            <a asp-action="RemoverCategoria" asp-route-idCategoria="@Model.Id" class="btn btn-danger">Excluir</a>
+                <a asp-action="RemoverCategoria" asp-route-idCategoria="@Model.Id" class="btn btn-danger">Excluir</a>
             }
         </form>
     </div>
@@ -35,7 +32,7 @@
 
 <script>
     window.addEventListener("load", function () {
-        $.ajax({
+        @*$.ajax({
             url: "buscar-super-categorias",
             method: "post",
             data: {
@@ -47,6 +44,6 @@
             data.forEach(function (obj) {
                 $("#SuperCategoriaId").append(`<option value='${obj.id}'>${obj.nome}</option>`);
             })
-        });
+        });*@
     });
 </script>

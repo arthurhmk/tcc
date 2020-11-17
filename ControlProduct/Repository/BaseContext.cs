@@ -17,6 +17,7 @@ namespace ControlProduct.Repository
         public DbSet<PedidoExtra> PedidoExtra { get; set; }
         public DbSet<PedidoProduto> PedidoProduto { get; set; }
         public DbSet<Pagamento> Pagamento { get; set; }
+        public DbSet<Debito> Debito { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,7 @@ namespace ControlProduct.Repository
             modelBuilder.ApplyConfiguration(new Config.PedidoExtra());
             modelBuilder.ApplyConfiguration(new Config.PedidoProduto());
             modelBuilder.ApplyConfiguration(new Config.Pagamento());
+            modelBuilder.ApplyConfiguration(new Config.Debito());
         }
     }
 }

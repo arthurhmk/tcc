@@ -3,12 +3,16 @@
     ViewData["Title"] = "Novo Cliente";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Cliente</h1>
+<div class="text-center mb-3">
+    <h1 class="display-4">Cadastro de Cliente</h1>
 </div>
 
-<div class="row">
-    <div class="col-6">
+<div class="row justify-content-md-center">
+    <div class="col-10 border rounded shadow-sm p-3">
+        <p class="text-muted">
+            Os campos abaixo deverão ser preenchidos com as informações sobre o cliente.
+        </p>
+
         <form asp-action="CadastroCliente" method="post">
             <input type="hidden" asp-for="Id" />
 
@@ -17,14 +21,19 @@
                 <input asp-for="Nome" class="form-control" /><br />
             </div>
 
-            <div class="form-group">
-                <label asp-for="Email"></label>
-                <input asp-for="Email" class="form-control" /><br />
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Telefone"></label>
-                <input asp-for="Telefone" class="form-control" /><br />
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" class="form-control" /><br />
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label asp-for="Telefone"></label>
+                        <input asp-for="Telefone" class="form-control" /><br />
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -32,10 +41,10 @@
                 <input asp-for="Endereco" class="form-control" /><br />
             </div>
 
-            <button type="submit" class="btn btn-primary">@(Model.Id!=0?"Atualizar":"Cadastrar")</button>
+            <button type="submit" class="btn btn-primary">@(Model.Id != 0 ? "Atualizar" : "Cadastrar")</button>
             @if (Model.Id != 0)
             {
-            <a asp-action="RemoverCliente" asp-route-idCliente="@Model.Id" class="btn btn-danger">Excluir</a>
+                <a asp-action="RemoverCliente" asp-route-idCliente="@Model.Id" class="btn btn-danger">Excluir</a>
             }
         </form>
     </div>

@@ -1,0 +1,36 @@
+﻿@model List<Debito>
+@{
+    ViewData["Title"] = "Débitos";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Débitos</h1>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <table class="datatable-categorias table">
+            <thead>
+                <tr>
+                    <th>Mês</th>
+                    <th>Entrada</th>
+                    <th>Saída</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var debito in Model)
+                {
+                    <tr>
+                        <td>@debito.Data</td>
+                        <td>@debito.Valor</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <span>Total: </span>
+    <span>R$ @Model.Aggregate(0d,(acc,x)=>acc+x.Valor)</span>
+</div>

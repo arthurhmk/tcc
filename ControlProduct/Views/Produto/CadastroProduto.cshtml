@@ -3,12 +3,12 @@
     ViewData["Title"] = "Novo Produto";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Produto</h1>
+<div class="text-center mb-3">
+    <h1 class="display-4">Cadastro de Produto</h1>
 </div>
 
-<div class="row">
-    <div class="col-6">
+<div class="row justify-content-md-center">
+    <div class="col-10 border rounded shadow-sm p-3">
         <form asp-action="CadastroProduto" method="post">
             <input type="hidden" asp-for="Id" />
 
@@ -36,8 +36,10 @@
                 </select>
             </div>
 
+            <button class="btn-primary">Selecionar Categoria</button>
+
             <div class="form-group">
-                <label for="CategoriaId"></label>
+                <label asp-for="CategoriaId"></label>
                 <select id="CategoriaId" name="CategoriaId" class="form-control">
                     <option value=""></option>
                     @if (Model.CategoriaId != 0)
@@ -60,7 +62,7 @@
     window.addEventListener("load", function () {
         $.ajax({
             url: "/categoria/buscar-categorias",
-            method: "post"
+            method: "post",
             data: {
                 idCategoria: @Model.CategoriaId
             }

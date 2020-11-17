@@ -1,14 +1,14 @@
-﻿@model  Pedido
+﻿@model Pedido
 @{
     ViewData["Title"] = "Novo Pedido";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Pedido</h1>
+<div class="text-center mb-3">
+    <h1 class="display-4">Cadastro de Pedido</h1>
 </div>
 
-<div class="row">
-    <div class="col-6">
+<div class="row justify-content-md-center">
+    <div class="col-10 border rounded shadow-sm p-3">
         <form asp-action="CadastroPedido" method="post">
             <input type="hidden" asp-for="Id" />
 
@@ -59,12 +59,12 @@
             url: "/cliente/buscar-clientes",
             method: "post"
         })
-        .done(function( data ) {
-            console.log(data);
-            data.forEach(function (obj) {
-                $("#IdCliente").append(`<option value='${obj.id}'>${obj.nome}</option>`);
-            })
-        });
+            .done(function (data) {
+                console.log(data);
+                data.forEach(function (obj) {
+                    $("#IdCliente").append(`<option value='${obj.id}'>${obj.nome}</option>`);
+                })
+            });
 
         var formularioEntrega = $("#formularioEntrega *");
         formularioEntrega.remove();
