@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ControlProduct.Controllers.Common;
+using ControlProduct.Models;
 using ControlProduct.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +35,8 @@ namespace ControlProduct
 
             services.AddScoped(typeof(BaseRepository<>));
             services.AddScoped(typeof(BaseServices));
+
+            //var _repoCategoria = services.BuildServiceProvider().GetServices<BaseRepository<Categoria>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

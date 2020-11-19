@@ -69,3 +69,13 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
+
+
+
+
+
+.collapsing {
+    -webkit-transition: none;
+    transition: none;
+    display: none;
+}

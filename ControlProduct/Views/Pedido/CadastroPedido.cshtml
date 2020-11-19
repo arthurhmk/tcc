@@ -8,7 +8,7 @@
 </div>
 
 <div class="row justify-content-md-center">
-    <div class="col-10 border rounded shadow-sm p-3">
+    <div class="col-12 col-sm-10 border rounded shadow-sm p-3">
         <form asp-action="CadastroPedido" method="post">
             <input type="hidden" asp-for="Id" />
 
@@ -53,6 +53,44 @@
     </div>
 </div>
 
+<div class="container shadow-sm rounded border">
+    <div class="row">
+        <div class="col-5 rounded border">
+            @{
+                var categorias = (List<Categoria>)ViewBag.categorias;
+            }
+            <div id="categoriasList" class="row">
+                @for (var i=0;i<categorias.Count;i++)
+                {
+                    <div class="col-4 categoriaButton btn btn-outline-primary collapsed" data-toggle="collapse" data-target="#cat@(i)" aria-expanded="false" aria-controls="cat@(i)">
+                        @categorias[i].Nome
+                    </div>
+
+                    <div id="cat@(i)" class="collapse collapsed col-12 produtosList" data-parent="#categoriasList">
+                        <div class="card-body">
+                            @if (categorias[i].Produtos.Any())
+                            {
+                                @foreach (var prod in categorias[i].Produtos)
+                                {
+                                    <span>@prod.Nome</span><br />
+                                }
+                            }
+                            else
+                            {
+                                <i>Não há produtos nesta categoria</i>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-7 rounded border">
+
+        </div>
+    </div>
+</div>
+
+
 <script>
     window.addEventListener("load", function () {
         $.ajax({
@@ -78,5 +116,13 @@
                 formularioEntrega.remove();
             }
         });
+
+        $(".categoriaButton").on('click', function () {
+            $('.categoriaButton').removeClass('col-12').addClass('col-4')
+
+            if ($(this).hasClass('collapsed')) {
+                $(this).removeClass('col-4').addClass('col-12')
+            }
+        })
     });
 </script>

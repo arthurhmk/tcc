@@ -17,11 +17,18 @@ namespace ControlProduct.Controllers
     public class PedidoController : BaseController
     {
         BaseRepository<Pedido> _repoPedido;
+        BaseRepository<Categoria> _repoCategoria;
+        BaseRepository<Produto> _repoProduto;
+
         public PedidoController(BaseServices serv, 
-            BaseRepository<Pedido> repoPedido)
+            BaseRepository<Pedido> repoPedido,
+            BaseRepository<Categoria> repoCategoria,
+            BaseRepository<Produto> repoProduto)
             :base(serv)
         {
             _repoPedido = repoPedido;
+            _repoCategoria = repoCategoria;
+            _repoProduto = repoProduto;
         }
 
         [Route("")]
@@ -33,18 +40,25 @@ namespace ControlProduct.Controllers
                 .Include(p=> p.PedidoProdutos)
                 .OrderBy(p=> p.Id).ToListAsync();
             var model = pedidos.Select(p => new PedidoViewModel(p)).ToList();
+
             return View(model);
         }
 
         [Route("novo-pedido")]
         public async Task<IActionResult> CadastroPedido(int? idPedido)
-        { 
-            if(idPedido != null)
+        {
+            var produtosNoCat = await _repoProduto.Entity.AsNoTracking().Where(p=>p.CategoriaId==0).ToListAsync();
+            var categorias = await _repoCategoria.Entity.AsNoTracking().Include(p=>p.Produtos).ToListAsync();
+            ViewBag.produtosNoCat = produtosNoCat;
+            ViewBag.categorias = categorias;
+
+            if (idPedido != null)
             {
                 var pedidos = await _repoPedido.Entity.Where(p => p.Id == idPedido).ToListAsync();
                 if (pedidos.Any())
                     return View(pedidos.First());
             }
+
             return View(new Pedido());
         }
 
