@@ -13,14 +13,25 @@
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group">
-                <label asp-for="Valor"></label>
-                <input asp-for="Valor" class="form-control" />
+                <label asp-for="IdCliente"></label>
+                @{
+                    var clientes = (List<Cliente>)ViewBag.clientes;
+                    var clientesList = clientes.OrderBy(p => p.Nome).Select(p => new SelectListItem(p.Nome, p.Id + "", Model.IdCliente == p.Id));
+                }
+                <select id="IdCliente" name="IdCliente" asp-items="clientesList">
+                    <option></option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label for="IdCliente"></label>
-                <select id="IdCliente" name="IdCliente" class="form-control">
-                </select>
+                <label>Produtos do Pedido</label><br />
+                <a class="btn btn-outline-primary modal-trigger" style="cursor:pointer" href="#modalProduto"> <span class="produtoQtde">0</span> Produto(s) cadastrados</a>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="DataEntrega"></label>
+                <input asp-for="DataEntrega" value="@(Model.DataEntrega == null? "" :Model.DataEntrega.GetValueOrDefault().ToString("yyyy-MM-dd"))" class="form-control datepicker" />
             </div>
 
             <div class="form-group">
@@ -28,7 +39,7 @@
                     var selectlist = Html.GetEnumSelectList<ControlProduct.Models.Enum.TipoEntrega>().ToList();
                 }
                 <label asp-for="TipoEntrega"></label>
-                <select id="TipoEntrega" name="TipoEntrega" asp-items="selectlist" class="form-control">
+                <select id="TipoEntrega" name="TipoEntrega" asp-items="selectlist">
                 </select>
             </div>
 
@@ -40,30 +51,52 @@
 
                 <div class="form-group">
                     <label asp-for="ValorEntrega"></label>
-                    <input asp-for="ValorEntrega" class="form-control" />
+                    <input asp-for="ValorEntrega" class="form-control moneyMask" onchange="updateTotal()" />
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>Pagamento</label><br />
+                <label class="mr-4 text-dark">
+                    <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PAGO)" checked />
+                    <span>Valor já pago</span>
+                </label>
+                <label class="text-dark">
+                    <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PENDENTE)" />
+                    <span>Pagamento parcial</span>
+                </label>
+                <input class="moneyMask pagamentoParcial ml-4" style="width:200px" type="text" disabled />
+            </div>
+            <hr />
+
+            <div class="form-group">
+                <label>Preço do pedido:</label><br />
+                <span class="form-control font-weight-bold precoTotal" style="width:200px">Total: R$10,00</span>
             </div>
 
             <button type="submit" class="btn btn-primary">@(Model.Id != 0 ? "Atualizar" : "Cadastrar")</button>
             @if (Model.Id != 0)
             {
-                <a asp-action="RemoverCategoria" asp-route-idCategoria="@Model.Id" class="btn btn-danger">Excluir</a>
+                <a asp-action="RemoverPedido" asp-route-idPedido="@Model.Id" class="btn btn-danger">Excluir</a>
             }
         </form>
     </div>
 </div>
 
-<div class="container shadow-sm rounded border">
+<div id="modalProduto" class="modal custom-modal shadow-sm rounded border">
     <div class="row">
-        <div class="col-5 rounded border">
+        <div class="col-5 border-right p-3">
+            <h4>Lista de Produtos</h4>
             @{
                 var categorias = (List<Categoria>)ViewBag.categorias;
             }
             <div id="categoriasList" class="row">
-                @for (var i=0;i<categorias.Count;i++)
+                @for (var i = 0; i < categorias.Count; i++)
                 {
-                    <div class="col-4 categoriaButton btn btn-outline-primary collapsed" data-toggle="collapse" data-target="#cat@(i)" aria-expanded="false" aria-controls="cat@(i)">
-                        @categorias[i].Nome
+                    <div class="col-4 categoriaButton collapsed p-1" data-toggle="collapse" data-target="#cat@(i)" aria-expanded="false" aria-controls="cat@(i)">
+                        <span class="btn btn-outline-primary w-100">
+                            @categorias[i].Nome
+                        </span>
                     </div>
 
                     <div id="cat@(i)" class="collapse collapsed col-12 produtosList" data-parent="#categoriasList">
@@ -72,48 +105,86 @@
                             {
                                 @foreach (var prod in categorias[i].Produtos)
                                 {
-                                    <span>@prod.Nome</span><br />
+                                    <span class="waves-effect waves-teal btn-small btn-flat" style="width:100%" onclick="addProduto(@prod.Id, `@prod.Nome`, @prod.Valor)">@prod.Nome</span><br />
+                                    <hr />
                                 }
                             }
                             else
                             {
-                                <i>Não há produtos nesta categoria</i>
+                                <i>Não há produtos nesta categoria</i><br />
+                                <hr />
                             }
                         </div>
                     </div>
                 }
             </div>
         </div>
-        <div class="col-7 rounded border">
+        <div class="col-7 p-3">
+            <h4>Produtos do pedido</h4>
 
+            <div id="listaProdutoPedido">
+                <div class="row produtoPedido">
+                    <div class="col-12 col-xl-6 d-flex">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x-circle-fill produto-remove-button" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                        </svg>
+                        <span class="form-control text-center produtoPedidoDesc" style="margin:auto">Prod 1 - R$ 10,00</span>
+                    </div>
+                    <div class="col-auto d-flex text-right">
+                        <span style="margin:auto">Quantidade:</span>
+                    </div>
+                    <div class="col-auto text-right">
+                        <input type="number" class="form-control m-0 produtoPedidoQtde" value="1" min="1" max="999" style="display:inline-block; width:100px" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center produto-modal-bottom-row">
+                <div class="col-auto p-2">
+                    <span class="btn btn-outline-primary">Salvar Produtos</span>
+                </div>
+                <div class="col-auto p-2" style="width:200px">
+                    <span class="form-control text-center precoTotal">Total: R$10,00</span>
+                </div>
+                <div class="col-auto p-2">
+                    <span class="btn btn-outline-primary">Novo Produto</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 
+<div class="modal p-4" id="messageBox">
+    <h4>Um erro ocorreu!</h4>
+    <p class="text-muted"></p>
+</div>
+
 <script>
+    var produtos = [];
+    var produtoPedido = {};
+
     window.addEventListener("load", function () {
-        $.ajax({
-            url: "/cliente/buscar-clientes",
-            method: "post"
-        })
-            .done(function (data) {
-                console.log(data);
-                data.forEach(function (obj) {
-                    $("#IdCliente").append(`<option value='${obj.id}'>${obj.nome}</option>`);
-                })
-            });
+        setMoneyMask();
+
+        $('input[type=radio][name=radioPagamento]').change(function () {
+            if (this.value == @((int)ControlProduct.Models.Enum.EstadoPedido.PAGO))
+                $(".pagamentoParcial").attr("disabled", true)
+            else
+                $(".pagamentoParcial").attr("disabled", false)
+        });
 
         var formularioEntrega = $("#formularioEntrega *");
         formularioEntrega.remove();
         $("#TipoEntrega").change(function () {
-            console.log("A");
             if (String.fromCharCode($(this).val()) == 'E') {
-                console.log("E");
                 $("#formularioEntrega").append(formularioEntrega);
+                setMoneyMask();
+                updateTotal();
             }
             else {
                 formularioEntrega.remove();
+                updateTotal();
             }
         });
 
@@ -124,5 +195,136 @@
                 $(this).removeClass('col-4').addClass('col-12')
             }
         })
+
+        $(".datepicker").datepicker({
+            format: "yyyy-mm-dd",
+            i18n: {
+                cancel: 'Cancelar',
+                clear: 'Limpar',
+                done: 'Ok',
+                months: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+                monthsShort: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
+                weekdays: ["Domingo","Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
+                weekdaysShort: ["Dom","Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+                weekdaysAbbrev: ["D","S", "T", "Q", "Q", "S", "S"]
+            }, });
+        $(".modal").modal();
+        
+        produtoPedido = $(".produtoPedido");
+        produtoPedido.remove();
+
+        $('select').formSelect();
+        updateTotal();
+
+        
+        $("form").submit(function (e) {
+            e.preventDefault();
+            let data = getFormData($(this));
+            data.pedidoProdutos = produtos.map(p => { return { IdProduto: p.id, Quantidade: p.qtde * 1 } });
+            if (data.ValorEntrega) {
+                data.ValorEntrega = data.ValorEntrega.split(" ")[1] * 1;
+            }
+            if (data.radioPagamento) {
+                data.EstadoPedido = data.radioPagamento;
+            }
+            data.Valor = $(".precoTotal").eq(0).html().split("$")[1].replace(",",".") * 1;
+            console.log(data);
+            $.ajax({
+                url: $(this).attr("action"),
+                method: "post",
+                data: data
+            })
+                .done(function (d) {
+                    $("#messageBox").find("h4").html("Sucesso!");
+                    $("#messageBox").find("p").html("Cadastro do pedido realizado.<br>Redirecionando para a página principal...");
+                    M.Modal.getInstance($("#messageBox")[0]).open()
+                    
+                })
+                .fail(function (d) {
+                    $("#messageBox").find("h4").html("Um erro ocorreu!");
+                    $("#messageBox").find("p").html("Não foi possível cadastrar o produto.<br>Verifique os dados e tente novamente.");
+                    M.Modal.getInstance($("#messageBox")[0]).open()
+                });
+        });
     });
+
+    function getFormData($form) {
+
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function(n, i){
+            indexed_array[n['name']] = n['value'];
+        });
+
+    return indexed_array;
+}
+
+    function setMoneyMask() {
+        $(".moneyMask").inputmask('decimal', {
+                'rightAlign': false,
+                'alias': 'numeric',
+                'groupSeparator': ',',
+                'autoGroup': true,
+                'digits': 2,
+                'radixPoint': ".",
+                'digitsOptional': false,
+                'allowMinus': false,
+                'prefix': 'R$ ',
+                'placeholder': '0'
+        });
+    }
+
+    function addProduto(id, nome, valor) {
+        if (!!!produtos.filter(p => p.id == id).length) {
+            produtos.push({ "id": id, "nome": nome, "valor": valor, "qtde": 1 })
+            let newPedidoProduto = produtoPedido.clone();
+            $(newPedidoProduto).attr("id","pedidoProduto" + id);
+            $(newPedidoProduto).find("svg").click(function () {
+                removeProduto(id)
+            });
+            $(newPedidoProduto).find(".produtoPedidoDesc").html(prodDesc(nome, valor))
+            $(newPedidoProduto).find(".produtoPedidoQtde").change(function () {
+                changeQtde(id, $(this).val())
+            });
+
+            $("#listaProdutoPedido").append(newPedidoProduto);
+        }
+        updateTotal();
+    }
+
+    function changeQtde(id, qtde) {
+        let produto = produtos.filter(p => p.id == id);
+        if (produto.length) {
+            produto = produtos[produtos.indexOf(produto[0])]
+            produto.qtde = qtde;
+            $("#pedidoProduto" + id).find(".produtoPedidoDesc").html(prodDesc(produto.nome, qtde * produto.valor));
+        }
+        updateTotal();
+    }
+
+    function prodDesc(nome, vl) {
+        return nome+ " - " + precoDesc(vl)
+    }
+    function precoDesc(vl) {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(vl)
+    }
+
+    function removeProduto(id) {
+        let remover = produtos.filter(p => p.id == id);
+        if (remover.length) {
+            produtos.splice(produtos.indexOf(remover[0]), 1);
+            $("#pedidoProduto" + id).remove();
+        }
+        updateTotal();
+    }
+
+    function updateTotal() {
+        let preco = produtos.reduce((acc, x) => acc + x.valor * x.qtde, 0)
+        let entregaPreco = $("#ValorEntrega").val();
+        if (entregaPreco != undefined)
+            preco += entregaPreco.split(" ")[1] * 1;
+        $(".precoTotal").html("Total: " + precoDesc(preco));
+        $(".produtoQtde").html(produtos.length);
+    }
 </script>

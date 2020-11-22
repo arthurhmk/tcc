@@ -19,16 +19,19 @@ namespace ControlProduct.Controllers
         BaseRepository<Pedido> _repoPedido;
         BaseRepository<Categoria> _repoCategoria;
         BaseRepository<Produto> _repoProduto;
+        BaseRepository<Cliente> _repoCliente;
 
         public PedidoController(BaseServices serv, 
             BaseRepository<Pedido> repoPedido,
             BaseRepository<Categoria> repoCategoria,
-            BaseRepository<Produto> repoProduto)
+            BaseRepository<Produto> repoProduto,
+            BaseRepository<Cliente> repoCliente)
             :base(serv)
         {
             _repoPedido = repoPedido;
             _repoCategoria = repoCategoria;
             _repoProduto = repoProduto;
+            _repoCliente = repoCliente;
         }
 
         [Route("")]
@@ -37,9 +40,9 @@ namespace ControlProduct.Controllers
             var pedidos =  await _repoPedido.Entity.AsNoTracking()
                 .Include(p=> p.Cliente)
                 .Include(p=> p.Pagamentos)
-                .Include(p=> p.PedidoProdutos)
+                .Include(p=> p.PedidoProdutos).ThenInclude(p=> p.Produto)
                 .OrderBy(p=> p.Id).ToListAsync();
-            var model = pedidos.Select(p => new PedidoViewModel(p)).ToList();
+            var model = pedidos.Select(p => new PedidoViewModel(p)).OrderByDescending(p=>p.Id).ToList();
 
             return View(model);
         }
@@ -49,8 +52,10 @@ namespace ControlProduct.Controllers
         {
             var produtosNoCat = await _repoProduto.Entity.AsNoTracking().Where(p=>p.CategoriaId==0).ToListAsync();
             var categorias = await _repoCategoria.Entity.AsNoTracking().Include(p=>p.Produtos).ToListAsync();
+            var clientes = await _repoCliente.Entity.AsNoTracking().ToListAsync();
             ViewBag.produtosNoCat = produtosNoCat;
             ViewBag.categorias = categorias;
+            ViewBag.clientes = clientes;
 
             if (idPedido != null)
             {
@@ -68,6 +73,7 @@ namespace ControlProduct.Controllers
         {
             if (ModelState.IsValid)
             {
+                pedido.PedidoProdutos.ForEach(p => p.Pedido = pedido);
                 if (pedido.Id != 0)
                     await _repoPedido.Update(pedido);
                 else

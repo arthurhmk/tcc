@@ -8,8 +8,14 @@ namespace ControlProduct.Models
 {
     public class Pedido
     {
+        public Pedido()
+        {
+        }
+
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "Esse campo é obrigatório.")]
+        [DisplayName("Nome do Cliente")]
         public int IdCliente { get; set; }
 
         public double Valor { get; set; }
@@ -18,12 +24,18 @@ namespace ControlProduct.Models
 
         public DateTime DataPedido{ get; set; }
 
+        [Required(ErrorMessage = "Esse campo é obrigatório.")]
+        [DisplayName("Data de Entrega")]
         public DateTime? DataEntrega { get; set; }
 
+        [Required(ErrorMessage = "Esse campo é obrigatório.")]
+        [DisplayName("Forma de recebimento do pedido")]
         public TipoEntrega TipoEntrega { get; set; }
 
+        [DisplayName("Endereço para entregar")]
         public string EnderecoEntrega { get; set; }
 
+        [DisplayName("Custo adicional da entrega")]
         public double ValorEntrega { get; set; }
 
         public Cliente Cliente { get; set; }

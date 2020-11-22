@@ -12,8 +12,8 @@ namespace ControlProduct.Models.ViewModel
             Cliente = pedido.Cliente.Nome;
             Valor = pedido.Valor;
             Pedido = pedido.PedidoProdutos.Select(p => new ProdutoPedidoViewModel(p.Produto, p.Quantidade)).ToList();
-            DataPedido = pedido.DataPedido.ToString();
-            DataEntrega = pedido.DataEntrega?.ToString();
+            DataPedido = pedido.DataPedido.ToString("yyyy-MM-dd");
+            DataEntrega = pedido.DataEntrega.GetValueOrDefault().ToString("yyyy-MM-dd");
             LocalEntrega = pedido.EnderecoEntrega?? "A retirar";
             Status = EstadoEnumToString(pedido.Estado);
             ValorPago = pedido.Pagamentos.Aggregate(0D, (acc, x) => acc + x.Valor);
@@ -25,6 +25,7 @@ namespace ControlProduct.Models.ViewModel
         public double Valor { get; set; }
         public string DataPedido { get; set; }
         public string DataEntrega { get; set; }
+
         public string LocalEntrega { get; set; }
         public string Status { get; set; }
         public double ValorPago { get; set; }

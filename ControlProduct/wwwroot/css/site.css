@@ -76,6 +76,51 @@ body {
 
 .collapsing {
     -webkit-transition: none;
-    transition: none;
-    display: none;
+    transition: 0.1s;
+    display: unset;
 }
+.produtosList{
+    background-color: white;
+}
+.modal{
+    height:unset;
+}
+.custom-modal{
+    width:80%;
+}
+    .custom-modal > .row {
+        min-height: 500px;
+        margin: 0;
+    }
+.produto-modal-bottom-row{
+    position:absolute;
+    width:100%;
+    bottom:0;
+}
+.produto-remove-button {
+    color: #ea6363;
+    cursor: pointer;
+    position: absolute;
+    left: 8px;
+}
+.datepicker-controls .select-month input {
+    width: 90px;
+}
+.btn:active {
+    background-color: unset;
+}
+.btn-danger {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+    .btn-danger:hover {
+        color: #fff;
+        background-color: #f55968;
+        border-color: #dc3545;
+    }
+    .btn-danger:active {
+        color: #fff;
+        background-color: #b1333f;
+        border-color: #dc3545;
+    }

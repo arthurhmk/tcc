@@ -4,6 +4,8 @@
     {
         COMPLETO = 'C',
 
-        PENDENTE = 'P'
+        PENDENTE = 'P',
+
+        PAGO = 'A',
     }
 }
