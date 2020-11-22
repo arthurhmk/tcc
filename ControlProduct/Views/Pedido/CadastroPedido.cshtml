@@ -31,12 +31,17 @@
 
             <div class="form-group">
                 <label asp-for="DataEntrega"></label>
-                <input asp-for="DataEntrega" value="@(Model.DataEntrega == null? "" :Model.DataEntrega.GetValueOrDefault().ToString("yyyy-MM-dd"))" class="form-control datepicker" />
+                <input asp-for="DataEntrega" value="@(Model.DataEntrega == null ? "" : Model.DataEntrega.GetValueOrDefault().ToString("yyyy-MM-dd"))" class="form-control datepicker" />
             </div>
 
             <div class="form-group">
                 @{
                     var selectlist = Html.GetEnumSelectList<ControlProduct.Models.Enum.TipoEntrega>().ToList();
+                    foreach (var selecteditem in selectlist)
+                    {
+                        if (selecteditem.Text == Model.TipoEntrega.ToString())
+                            selecteditem.Selected = true;
+                    }
                 }
                 <label asp-for="TipoEntrega"></label>
                 <select id="TipoEntrega" name="TipoEntrega" asp-items="selectlist">
@@ -58,14 +63,26 @@
             <div class="form-group">
                 <label>Pagamento</label><br />
                 <label class="mr-4 text-dark">
-                    <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PAGO)" checked />
+                    <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PAGO)" 
+                           @{if (ControlProduct.Models.Enum.EstadoPedido.PAGO == Model.Estado) {@Html.Raw("checked") } } />
                     <span>Valor já pago</span>
                 </label>
                 <label class="text-dark">
-                    <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PENDENTE)" />
+                    <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PENDENTE)"
+                           @{if (ControlProduct.Models.Enum.EstadoPedido.PENDENTE == Model.Estado) {@Html.Raw("checked") } } />
                     <span>Pagamento parcial</span>
                 </label>
-                <input class="moneyMask pagamentoParcial ml-4" style="width:200px" type="text" disabled />
+                @{ 
+                    double valorpago;
+                    if(Model.Pagamentos != null)
+                    {
+                        var pagamento = Model.Pagamentos.FirstOrDefault();
+                        valorpago = pagamento == null ? 0 : pagamento.Valor;
+                    }
+                    else
+                        valorpago = 0;
+                }
+                <input class="moneyMask pagamentoParcial ml-4" style="width:200px" type="text" name="Pagamentos[0].Valor" value="@valorpago" @{if (ControlProduct.Models.Enum.EstadoPedido.PENDENTE != Model.Estado) {@Html.Raw("disabled") } } />
             </div>
             <hr />
 
@@ -141,7 +158,7 @@
 
             <div class="row justify-content-center produto-modal-bottom-row">
                 <div class="col-auto p-2">
-                    <span class="btn btn-outline-primary">Salvar Produtos</span>
+                    <a class="btn btn-outline-primary modal-close" href="#modalProduto">Salvar Produtos</a>
                 </div>
                 <div class="col-auto p-2" style="width:200px">
                     <span class="form-control text-center precoTotal">Total: R$10,00</span>
@@ -163,6 +180,7 @@
 <script>
     var produtos = [];
     var produtoPedido = {};
+    var clientes = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(((List<Cliente>)ViewBag.clientes).Select(p => new { p.Id, p.Endereco })));
 
     window.addEventListener("load", function () {
         setMoneyMask();
@@ -175,18 +193,19 @@
         });
 
         var formularioEntrega = $("#formularioEntrega *");
-        formularioEntrega.remove();
+        @{ if (Model.TipoEntrega != ControlProduct.Models.Enum.TipoEntrega.ENTREGA) { @Html.Raw("formularioEntrega.remove();"); } }
         $("#TipoEntrega").change(function () {
-            if (String.fromCharCode($(this).val()) == 'E') {
+                if (String.fromCharCode($(this).val()) == 'E') {
                 $("#formularioEntrega").append(formularioEntrega);
-                setMoneyMask();
-                updateTotal();
-            }
-            else {
-                formularioEntrega.remove();
-                updateTotal();
-            }
-        });
+                    setMoneyMask();
+                    updateTotal();
+                    setEnderecoCliente();
+                }
+                else {
+                    formularioEntrega.remove();
+                    updateTotal();
+                }
+            });
 
         $(".categoriaButton").on('click', function () {
             $('.categoriaButton').removeClass('col-12').addClass('col-4')
@@ -194,7 +213,7 @@
             if ($(this).hasClass('collapsed')) {
                 $(this).removeClass('col-4').addClass('col-12')
             }
-        })
+            })
 
         $(".datepicker").datepicker({
             format: "yyyy-mm-dd",
@@ -209,14 +228,14 @@
                 weekdaysAbbrev: ["D","S", "T", "Q", "Q", "S", "S"]
             }, });
         $(".modal").modal();
-        
-        produtoPedido = $(".produtoPedido");
+
+            produtoPedido = $(".produtoPedido");
         produtoPedido.remove();
 
         $('select').formSelect();
-        updateTotal();
+            updateTotal();
 
-        
+
         $("form").submit(function (e) {
             e.preventDefault();
             let data = getFormData($(this));
@@ -225,7 +244,10 @@
                 data.ValorEntrega = data.ValorEntrega.split(" ")[1] * 1;
             }
             if (data.radioPagamento) {
-                data.EstadoPedido = data.radioPagamento;
+                data.Estado = data.radioPagamento;
+            }
+            if (data["Pagamentos[0].Valor"]) {
+                data["Pagamentos[0].Valor"] = data["Pagamentos[0].Valor"].split(" ")[1] * 1;
             }
             data.Valor = $(".precoTotal").eq(0).html().split("$")[1].replace(",",".") * 1;
             console.log(data);
@@ -236,16 +258,31 @@
             })
                 .done(function (d) {
                     $("#messageBox").find("h4").html("Sucesso!");
-                    $("#messageBox").find("p").html("Cadastro do pedido realizado.<br>Redirecionando para a página principal...");
+                    $("#messageBox").find("p").html("Cadastro do pedido realizado.<br>Redirecionando para a página principal...").modal({dismissible:false});
                     M.Modal.getInstance($("#messageBox")[0]).open()
-                    
+
+                    setTimeout(function(){ window.location.href = d.route; }, 2000);
                 })
                 .fail(function (d) {
                     $("#messageBox").find("h4").html("Um erro ocorreu!");
                     $("#messageBox").find("p").html("Não foi possível cadastrar o produto.<br>Verifique os dados e tente novamente.");
                     M.Modal.getInstance($("#messageBox")[0]).open()
                 });
-        });
+            });
+
+
+        @{
+            if (Model.PedidoProdutos != null)
+            {
+                var produtos = categorias.Select(p => p.Produtos).SelectMany(p => p);
+
+                foreach (var produto in Model.PedidoProdutos)
+                {
+                    var selectedprod = produtos.Where(p => p.Id == produto.IdProduto).FirstOrDefault();
+                    @Html.Raw($"addProduto({produto.IdProduto},'{selectedprod.Nome}',{selectedprod.Valor},{produto.Quantidade});");
+                }
+            }
+        }
     });
 
     function getFormData($form) {
@@ -275,15 +312,17 @@
         });
     }
 
-    function addProduto(id, nome, valor) {
+    function addProduto(id, nome, valor, qtd) {
         if (!!!produtos.filter(p => p.id == id).length) {
-            produtos.push({ "id": id, "nome": nome, "valor": valor, "qtde": 1 })
+            let qtde = !!qtd?qtd:1
+            produtos.push({ "id": id, "nome": nome, "valor": valor, "qtde": qtde })
             let newPedidoProduto = produtoPedido.clone();
             $(newPedidoProduto).attr("id","pedidoProduto" + id);
             $(newPedidoProduto).find("svg").click(function () {
                 removeProduto(id)
             });
             $(newPedidoProduto).find(".produtoPedidoDesc").html(prodDesc(nome, valor))
+            $(newPedidoProduto).find(".produtoPedidoQtde").val(qtde);
             $(newPedidoProduto).find(".produtoPedidoQtde").change(function () {
                 changeQtde(id, $(this).val())
             });
@@ -326,5 +365,12 @@
             preco += entregaPreco.split(" ")[1] * 1;
         $(".precoTotal").html("Total: " + precoDesc(preco));
         $(".produtoQtde").html(produtos.length);
+    }
+
+    function setEnderecoCliente() {
+        let cliente = clientes.filter(p => p.Id == $("#IdCliente").val()*1)
+        if (cliente.length) {
+            $("#EnderecoEntrega").val(cliente[0].Endereco);
+        }
     }
 </script>

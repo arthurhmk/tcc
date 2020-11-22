@@ -12,7 +12,9 @@ namespace ControlProduct.Repository.Config
                 .ToTable("pedido_produto", "ControlProduct");
 
             builder
-                .HasKey(p => new { p.IdPedido, p.IdProduto });
+                .Property(p => p.Id)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("cd_pedido_produto");
 
             builder
                 .Property(p => p.IdProduto)

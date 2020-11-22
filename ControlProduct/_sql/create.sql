@@ -31,7 +31,7 @@ CREATE TABLE ControlProduct.pedido (
   CONSTRAINT FK_PEDIDO_CLIENTE
     FOREIGN KEY (cd_cliente)
     REFERENCES ControlProduct.cliente (cd_cliente)
-    ON DELETE NO ACTION
+    ON DELETE SET NULL
     ON UPDATE NO ACTION)
 ;
 
@@ -112,15 +112,17 @@ CREATE TABLE ControlProduct.produto (
 -- Table pedido_produto
 -- -----------------------------------------------------
 CREATE TABLE ControlProduct.pedido_produto (
+  cd_pedido_produto INT NOT NULL IDENTITY(1,1),
   cd_produto INT NULL,
   cd_pedido INT NULL,
   qt_produto INT NOT NULL DEFAULT 1,
-  CONSTRAINT FK_PEDIDO
+  PRIMARY KEY (cd_pedido_produto),
+  CONSTRAINT FK_PRODUTO
     FOREIGN KEY (cd_produto)
     REFERENCES ControlProduct.produto (cd_produto)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT FK_PRODUTO
+  CONSTRAINT FK_PEDIDO
     FOREIGN KEY (cd_pedido)
     REFERENCES ControlProduct.pedido (cd_pedido)
     ON DELETE NO ACTION

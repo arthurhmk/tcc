@@ -41,7 +41,14 @@
                         <td>@pedido.DataEntrega</td>
                         <td>@pedido.LocalEntrega</td>
                         <td>@pedido.Status</td>
-                        <td>@pedido.ValorPago</td>
+                        @if(pedido.StatusEnum == ControlProduct.Models.Enum.EstadoPedido.PENDENTE)
+                        {
+                            <td>@pedido.ValorPago</td>
+                        }
+                        else
+                        {
+                            <td>-</td>
+                        }
                         <td>
                             <a asp-action="CadastroPedido" asp-route-idPedido="@pedido.Id">
                                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

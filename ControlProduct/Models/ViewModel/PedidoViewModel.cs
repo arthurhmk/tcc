@@ -16,6 +16,7 @@ namespace ControlProduct.Models.ViewModel
             DataEntrega = pedido.DataEntrega.GetValueOrDefault().ToString("yyyy-MM-dd");
             LocalEntrega = pedido.EnderecoEntrega?? "A retirar";
             Status = EstadoEnumToString(pedido.Estado);
+            StatusEnum = pedido.Estado;
             ValorPago = pedido.Pagamentos.Aggregate(0D, (acc, x) => acc + x.Valor);
         }
 
@@ -28,12 +29,14 @@ namespace ControlProduct.Models.ViewModel
 
         public string LocalEntrega { get; set; }
         public string Status { get; set; }
+        public EstadoPedido StatusEnum { get; set; }
         public double ValorPago { get; set; }
 
         private string EstadoEnumToString(EstadoPedido estado) => estado switch
         {
-            EstadoPedido.COMPLETO => "Fechado",
-            EstadoPedido.PENDENTE => "Aberto",
+            EstadoPedido.COMPLETO => "Entregue",
+            EstadoPedido.PENDENTE => "Pagamento parcial",
+            EstadoPedido.PAGO     => "Pago",
             _ => "NO_STATE"
         };
     }

@@ -20,18 +20,21 @@ namespace ControlProduct.Controllers
         BaseRepository<Categoria> _repoCategoria;
         BaseRepository<Produto> _repoProduto;
         BaseRepository<Cliente> _repoCliente;
+        BaseRepository<PedidoProduto> _repoPedidoProduto;
 
         public PedidoController(BaseServices serv, 
             BaseRepository<Pedido> repoPedido,
             BaseRepository<Categoria> repoCategoria,
             BaseRepository<Produto> repoProduto,
-            BaseRepository<Cliente> repoCliente)
+            BaseRepository<Cliente> repoCliente,
+            BaseRepository<PedidoProduto> repoPedidoProduto)
             :base(serv)
         {
             _repoPedido = repoPedido;
             _repoCategoria = repoCategoria;
             _repoProduto = repoProduto;
             _repoCliente = repoCliente;
+            _repoPedidoProduto = repoPedidoProduto;
         }
 
         [Route("")]
@@ -59,7 +62,7 @@ namespace ControlProduct.Controllers
 
             if (idPedido != null)
             {
-                var pedidos = await _repoPedido.Entity.Where(p => p.Id == idPedido).ToListAsync();
+                var pedidos = await _repoPedido.Entity.AsNoTracking().Where(p => p.Id == idPedido).Include(p=>p.PedidoProdutos).Include(p=>p.Pagamentos).ToListAsync();
                 if (pedidos.Any())
                     return View(pedidos.First());
             }
@@ -74,15 +77,43 @@ namespace ControlProduct.Controllers
             if (ModelState.IsValid)
             {
                 pedido.PedidoProdutos.ForEach(p => p.Pedido = pedido);
+                if (pedido.Pagamentos != null)
+                {
+                    pedido.Pagamentos.ForEach(p => p.Pedido = pedido);
+                }
+
                 if (pedido.Id != 0)
-                    await _repoPedido.Update(pedido);
+                {
+                    var oldPedido = await _repoPedido.Entity.AsNoTracking().Include(p=>p.PedidoProdutos).ThenInclude(p=>p.Produto).Include(p=>p.Pagamentos).Where(p=>p.Id == pedido.Id).ToListAsync();
+                    if (oldPedido.Any())
+                    {
+                        if(pedido.Pagamentos != null && oldPedido.First().Pagamentos.Any())
+                        {
+                            pedido.Pagamentos.First().Id = oldPedido.First().Pagamentos.First().Id;
+                        }
+
+                        //Atrubuir o Id de produtos já cadastrados no pedido
+                        PedidoProduto temp;
+                        pedido.PedidoProdutos.ForEach(p => p.Id = (temp = oldPedido.First().PedidoProdutos.FirstOrDefault(q => q.IdProduto == p.IdProduto)) == null? 0 : temp.Id);
+
+                        pedido.DataPedido = oldPedido.First().DataPedido;
+                        await _repoPedido.Update(pedido);
+
+                        var produtosRemover = oldPedido.First().PedidoProdutos.Where(p => !pedido.PedidoProdutos.Select(q => q.IdProduto).Contains(p.IdProduto));
+                        foreach(var pr in produtosRemover)
+                        {
+                            pr.Produto = null;
+                            pr.Pedido = null;
+                            await _repoPedidoProduto.Delete(pr);
+                        }
+                    }
+                }
                 else
                 {
                     pedido.DataPedido = DateTime.Now;
-                    pedido.Estado = Models.Enum.EstadoPedido.PENDENTE;
                     await _repoPedido.Insert(pedido);
                 }
-                return RedirectToAction(nameof(Index));
+                return Json(new { route = "/" });
             }
 
             throw new Exception("Pedido inválido");
@@ -93,10 +124,10 @@ namespace ControlProduct.Controllers
         {
             if (idPedido != null)
             {
-                var pedido = await _repoPedido.Entity.FindAsync(idPedido);
+                var pedido = await _repoPedido.Entity.Include(p=>p.PedidoProdutos).Where(p=>p.Id == idPedido).ToListAsync();
                 if (pedido != null)
                 {
-                    await _repoPedido.Delete(pedido);
+                    await _repoPedido.Delete(pedido.First());
                     return RedirectToAction(nameof(Index));
                 }
             }
