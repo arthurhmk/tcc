@@ -9,6 +9,8 @@ namespace ControlProduct.Models
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "Esse campo é obrigatório.")]
+        [DisplayName("Categoria do Produto")]
         public int CategoriaId { get; set; }
 
         [Required(ErrorMessage ="Esse campo é obrigatório.")]

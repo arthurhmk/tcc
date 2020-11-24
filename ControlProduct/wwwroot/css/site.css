@@ -124,3 +124,42 @@ body {
         background-color: #b1333f;
         border-color: #dc3545;
     }
+.pagination li a{
+    font-size:unset;
+}
+.nav-link{
+    padding-right:1rem!important;
+    padding-right:1rem!important;
+}
+body .container{
+    width:100%;
+}
+table{
+    width:100%!important;
+}
+    table.dataTable thead th{
+        padding-left:20px;
+    }
+    table.dataTable > thead .sorting::before, table.dataTable > thead .sorting::after,
+    table.dataTable > thead .sorting_asc::before, table.dataTable > thead .sorting_asc::after,
+    table.dataTable > thead .sorting_desc::before, table.dataTable > thead .sorting_desc::after {
+        content: none;
+    }
+    table.dataTable thead .sorting_asc {
+        background: url("http://cdn.datatables.net/1.10.0/images/sort_asc.png") no-repeat center left;
+    }
+
+    table.dataTable thead .sorting_desc {
+        background: url("http://cdn.datatables.net/1.10.0/images/sort_desc.png") no-repeat center left;
+    }
+
+    table.dataTable thead .sorting {
+        background: url("http://cdn.datatables.net/1.10.0/images/sort_both.png") no-repeat center left;
+    }
+.navbar {
+    background-color: #2e6ca1;
+    color: white;
+}
+    .navbar a:hover {
+        color: #f6eb9b;
+    }

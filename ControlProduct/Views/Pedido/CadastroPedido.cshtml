@@ -118,9 +118,9 @@
 
                     <div id="cat@(i)" class="collapse collapsed col-12 produtosList" data-parent="#categoriasList">
                         <div class="card-body">
-                            @if (categorias[i].Produtos.Any())
+                            @if (categorias[i].Produtos.Where(p => p.Ativo == ControlProduct.Models.Enum.EstadoProduto.ATIVO).Any())
                             {
-                                @foreach (var prod in categorias[i].Produtos)
+                                @foreach (var prod in categorias[i].Produtos.Where(p => p.Ativo == ControlProduct.Models.Enum.EstadoProduto.ATIVO))
                                 {
                                     <span class="waves-effect waves-teal btn-small btn-flat" style="width:100%" onclick="addProduto(@prod.Id, `@prod.Nome`, @prod.Valor)">@prod.Nome</span><br />
                                     <hr />
@@ -169,12 +169,6 @@
             </div>
         </div>
     </div>
-</div>
-
-
-<div class="modal p-4" id="messageBox">
-    <h4>Um erro ocorreu!</h4>
-    <p class="text-muted"></p>
 </div>
 
 <script>
@@ -229,11 +223,11 @@
             }, });
         $(".modal").modal();
 
-            produtoPedido = $(".produtoPedido");
+        produtoPedido = $(".produtoPedido");
         produtoPedido.remove();
 
         $('select').formSelect();
-            updateTotal();
+        updateTotal();
 
 
         $("form").submit(function (e) {
@@ -241,13 +235,13 @@
             let data = getFormData($(this));
             data.pedidoProdutos = produtos.map(p => { return { IdProduto: p.id, Quantidade: p.qtde * 1 } });
             if (data.ValorEntrega) {
-                data.ValorEntrega = data.ValorEntrega.split(" ")[1] * 1;
+                data.ValorEntrega = data.ValorEntrega.split("$")[1] * 1;
             }
             if (data.radioPagamento) {
                 data.Estado = data.radioPagamento;
             }
             if (data["Pagamentos[0].Valor"]) {
-                data["Pagamentos[0].Valor"] = data["Pagamentos[0].Valor"].split(" ")[1] * 1;
+                data["Pagamentos[0].Valor"] = data["Pagamentos[0].Valor"].split("$")[1] * 1;
             }
             data.Valor = $(".precoTotal").eq(0).html().split("$")[1].replace(",",".") * 1;
             console.log(data);
@@ -258,17 +252,18 @@
             })
                 .done(function (d) {
                     $("#messageBox").find("h4").html("Sucesso!");
-                    $("#messageBox").find("p").html("Cadastro do pedido realizado.<br>Redirecionando para a página principal...").modal({dismissible:false});
+                    $("#messageBox").modal({ dismissible: false });
+                    $("#messageBox").find("p").html("Cadastro do pedido realizado.<br>Redirecionando para a página principal...");
                     M.Modal.getInstance($("#messageBox")[0]).open()
 
                     setTimeout(function(){ window.location.href = d.route; }, 2000);
                 })
                 .fail(function (d) {
                     $("#messageBox").find("h4").html("Um erro ocorreu!");
-                    $("#messageBox").find("p").html("Não foi possível cadastrar o produto.<br>Verifique os dados e tente novamente.");
+                    $("#messageBox").find("p").html("Não foi possível cadastrar o pedido.<br>Verifique os dados e tente novamente.");
                     M.Modal.getInstance($("#messageBox")[0]).open()
                 });
-            });
+        });
 
 
         @{
@@ -294,14 +289,14 @@
             indexed_array[n['name']] = n['value'];
         });
 
-    return indexed_array;
-}
+        return indexed_array;
+    }
 
     function setMoneyMask() {
         $(".moneyMask").inputmask('decimal', {
                 'rightAlign': false,
                 'alias': 'numeric',
-                'groupSeparator': ',',
+                'groupSeparator': '',
                 'autoGroup': true,
                 'digits': 2,
                 'radixPoint': ".",

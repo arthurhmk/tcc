@@ -17,11 +17,15 @@ namespace ControlProduct.Controllers
     public class ProdutoController : BaseController
     {
         BaseRepository<Produto> _repoProduto;
+        BaseRepository<Categoria> _repoCategoria;
+
         public ProdutoController(BaseServices serv, 
+            BaseRepository<Categoria> repoCategoria,
             BaseRepository<Produto> repoProduto)
             :base(serv)
         {
             _repoProduto = repoProduto;
+            _repoCategoria = repoCategoria;
         }
 
         [Route("")]
@@ -34,9 +38,11 @@ namespace ControlProduct.Controllers
         [Route("novo-produto")]
         public async Task<IActionResult> CadastroProduto(int? idProduto)
         {
+            var categorias = await _repoCategoria.Entity.AsNoTracking().ToListAsync();
+            ViewBag.categorias = categorias;
             if(idProduto != null)
             {
-                var produtos = await _repoProduto.Entity.Include(p => p.Categoria).Where(p => p.Id == idProduto).ToListAsync();
+                var produtos = await _repoProduto.Entity.AsNoTracking().Include(p => p.Categoria).Where(p => p.Id == idProduto).ToListAsync();
                 if (produtos.Any())
                     return View(produtos.First());
             }
@@ -52,8 +58,14 @@ namespace ControlProduct.Controllers
                 if (produto.Id != 0)
                     await _repoProduto.Update(produto);
                 else
+                {
+                    var oldProduto = await _repoProduto.Entity.AsNoTracking().Where(p => p.Nome.ToUpper() == produto.Nome.ToUpper()).ToListAsync();
+                    if (oldProduto.Any())
+                        throw new Exception("Produto já existente");    
                     await _repoProduto.Insert(produto);
-                return RedirectToAction(nameof(Index));
+                }
+
+                return Json(new { route = "/produto" });
             }
 
             throw new Exception("Produto inválido");

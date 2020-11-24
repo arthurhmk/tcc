@@ -6,13 +6,12 @@
     <title>@ViewData["Title"] - ControlProduct</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/datatables/dataTables.bootstrap4.css" />
-    @*<link rel="stylesheet" href="~/lib/jquery-modal/jquery.modal.min.css" />*@
     <link rel="stylesheet" href="~/lib/materialize/materialize.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" style="height:80px">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Pedido" asp-action="Index">ControlProduct</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -20,21 +19,21 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Pedido" asp-action="Index">Pedidos</a>
+                            <a class="nav-link" asp-area="" asp-controller="Pedido" asp-action="Index">Pedidos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cliente" asp-action="Index">Clientes</a>
+                            <a class="nav-link" asp-area="" asp-controller="Cliente" asp-action="Index">Clientes</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Produto" asp-action="Index">Produtos</a>
+                            <a class="nav-link" asp-area="" asp-controller="Produto" asp-action="Index">Produtos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Categoria" asp-action="Index">Categorias</a>
+                            <a class="nav-link" asp-area="" asp-controller="Categoria" asp-action="Index">Categorias</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Debito" asp-action="Index">Débitos</a>
+                            <a class="nav-link" asp-area="" asp-controller="Debito" asp-action="Index">Débitos</a>
                         </li>
                     </ul>
                 </div>
@@ -47,16 +46,20 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2020 - ControlProduct - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    <div class="modal p-4" id="messageBox">
+        <h4>Um erro ocorreu!</h4>
+        <p class="text-muted"></p>
+    </div>
+
+    @*<footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2020 - ControlProduct - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>*@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatables/dataTables.bootstrap4.min.js"></script>
-    @*<script src="~/lib/jquery-modal/jquery.modal.min.js"></script>*@
     <script src="~/lib/materialize/materialize.min.js"></script>
     <script src="~/lib/jquery-inputmask/jquery.inputmask.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

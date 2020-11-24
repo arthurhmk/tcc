@@ -34,16 +34,16 @@
                     <tr>
                         <td>@pedido.Cliente</td>
                         <td>
-                            <button class="btn btn-primary">@pedido.Pedido.Count Produto(s)</button>
+                            <button class="btn btn-primary" onclick='abrirListaProdutos(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(pedido.Pedido)))'>@pedido.Pedido.Count Produto(s)</button>
                         </td>
-                        <td>@pedido.Valor.ToString("C2", System.Globalization.CultureInfo.CurrentCulture)</td>
+                        <td class="moneyMask">@pedido.Valor</td>
                         <td>@pedido.DataPedido</td>
                         <td>@pedido.DataEntrega</td>
                         <td>@pedido.LocalEntrega</td>
                         <td>@pedido.Status</td>
                         @if(pedido.StatusEnum == ControlProduct.Models.Enum.EstadoPedido.PENDENTE)
                         {
-                            <td>@pedido.ValorPago</td>
+                            <td class="moneyMask">@pedido.ValorPago</td>
                         }
                         else
                         {
@@ -63,46 +63,16 @@
     </div>
 </div>
 
+<div id="modalProduto" class="modal shadow-sm rounded border p-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-11 col-md-8">
+            <h4 class="mb-3">Lista de Produtos</h4>
+            <div class="listaProdutos"></div>
+        </div>
+    </div>
+</div>
+
 <script>
-    //var DataTableConfig = {
-    //    processing: true,
-    //    serverSide: true,
-    //    serverMethod: "POST",
-    //    ajax: {
-    //        url: "buscar-pedido",
-    //        dataSrc: "data",
-    //        data: function (d) {
-    //            //d.var = "custom"
-    //        }
-    //    },
-    //    columns: [
-    //        { data: "cliente" },
-    //        { data: "pedido" },
-    //        { data: "valor" },
-    //        { data: "dataPedido" },
-    //        { data: "dataEntrega" },
-    //        { data: "localEntrega" },
-    //        { data: "status" },
-    //        { data: "valorPago" },
-    //        { data: "id" }
-    //    ],
-    //    columnDefs: [
-    //        {
-    //            targets: 0,
-    //            render: function (data, type, row, meta) {
-    //                return data;
-    //            }
-    //        },
-    //        {
-    //            targets: 8,
-    //            orderable: false,
-    //            seachable: false,
-    //            render: function (data, type, row, meta) {
-    //                return data;
-    //            }
-    //        }
-    //    ]
-    //}
     var DataTableConfig = {
         columnDefs: [
             {
@@ -117,7 +87,25 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-
+            setMoneyMask();
+            $(".modal").modal();
         });
+
+        function abrirListaProdutos(produtos) {
+            $("#modalProduto").find(".listaProdutos").html("");
+            for (let i in produtos) {
+                prodElem = $(`<span class="form-control text-center"><b class="mr-3">Quantidade: ${produtos[i].Quantidade}</b>${prodDesc(produtos[i].Nome, produtos[i].Valor)}</span></br>`);
+                $("#modalProduto").find(".listaProdutos").append(prodElem);
+            }
+            M.Modal.getInstance($("#modalProduto")[0]).open()
+        }
+        
+
+        function prodDesc(nome, vl) {
+            return nome+ " - " + precoDesc(vl)
+        }
+        function precoDesc(vl) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(vl)
+        }
     </script>
 }

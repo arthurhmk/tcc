@@ -19,12 +19,12 @@
 
             <div class="form-group">
                 <label asp-for="Valor"></label>
-                <input asp-for="Valor" class="form-control" />
+                <input asp-for="Valor" type="text" class="form-control moneyMask" />
             </div>
 
             <div class="form-group">
                 <label asp-for="Quantidade"></label>
-                <input asp-for="Quantidade" class="form-control" />
+                <input asp-for="Quantidade" type="text" class="form-control" />
             </div>
 
             <div class="form-group">
@@ -32,20 +32,22 @@
                     var selectlist = Html.GetEnumSelectList<ControlProduct.Models.Enum.EstadoProduto>().ToList();
                 }
                 <label asp-for="Ativo"></label>
-                <select id="Ativo" name="Ativo" asp-items="selectlist" class="form-control">
+                <select id="Ativo" name="Ativo" asp-items="selectlist" >
                 </select>
             </div>
 
-            <button class="btn-primary">Selecionar Categoria</button>
-
             <div class="form-group">
-                <label asp-for="CategoriaId"></label>
-                <select id="CategoriaId" name="CategoriaId" class="form-control">
-                    <option value=""></option>
-                    @if (Model.CategoriaId != 0)
+                @{
+                    var categorias = (List<Categoria>)ViewBag.categorias;
+                    var selectlistCategorias = categorias.Select(p => new SelectListItem(p.Nome,p.Id.ToString()));
+                    foreach (var selecteditem in selectlistCategorias)
                     {
-                        <option value="@Model.CategoriaId" selected>@Model.Categoria.Nome</option>
+                        if (selecteditem.Value == Model.CategoriaId.ToString())
+                            selecteditem.Selected = true;
                     }
+                }
+                <label asp-for="CategoriaId"></label>
+                <select id="CategoriaId" name="CategoriaId" asp-items="selectlistCategorias">
                 </select>
             </div>
 
@@ -60,18 +62,41 @@
 
 <script>
     window.addEventListener("load", function () {
-        $.ajax({
-            url: "/categoria/buscar-categorias",
-            method: "post",
-            data: {
-                idCategoria: @Model.CategoriaId
+        $('select').formSelect();
+
+        $("#Quantidade").inputmask('integer', {
+                'rightAlign': false,
+                'allowMinus': false,
+                'placeholder': '0'
+        });
+        setMoneyMask();
+        $('.modal').modal();
+
+        $("form").submit(function (e) {
+            e.preventDefault();
+            let data = getFormData($(this));
+            if (data.Valor) {
+                data.Valor = data.Valor.split("$")[1] * 1;
             }
-        })
-        .done(function( data ) {
-            console.log(data);
-            data.forEach(function (obj) {
-                $("#CategoriaId").append(`<option value='${obj.id}'>${obj.nome}</option>`);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                method: "post",
+                data: data
             })
+                .done(function (d) {
+                    $("#messageBox").find("h4").html("Sucesso!");
+                    $("#messageBox").modal({ dismissible: false });
+                    $("#messageBox").find("p").html("Cadastro do produto realizado.<br>Redirecionando para a página principal...");
+                    M.Modal.getInstance($("#messageBox")[0]).open()
+
+                    setTimeout(function(){ window.location.href = d.route; }, 2000);
+                })
+                .fail(function (d) {
+                    $("#messageBox").find("h4").html("Um erro ocorreu!");
+                    $("#messageBox").find("p").html("Não foi possível cadastrar o produto.<br>Verifique os dados e tente novamente.");
+                    M.Modal.getInstance($("#messageBox")[0]).open()
+                });
         });
     });
 </script>
