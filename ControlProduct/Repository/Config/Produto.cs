@@ -9,7 +9,7 @@ namespace ControlProduct.Repository.Config
         public void Configure(EntityTypeBuilder<Models.Produto> builder)
         {
             builder
-                .ToTable("produto", "ControlProduct");
+                .ToTable("produto");
 
             builder
                 .Property(p => p.Id)

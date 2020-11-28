@@ -8,7 +8,7 @@ namespace ControlProduct.Repository.Config
         public void Configure(EntityTypeBuilder<Models.Debito> builder)
         {
             builder
-                .ToTable("debito", "ControlProduct");
+                .ToTable("debito");
 
             builder
                 .Property(p => p.Id)

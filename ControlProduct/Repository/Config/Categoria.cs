@@ -8,7 +8,7 @@ namespace ControlProduct.Repository.Config
         public void Configure(EntityTypeBuilder<Models.Categoria> builder)
         {
             builder
-                .ToTable("categoria", "ControlProduct");
+                .ToTable("categoria");
 
             builder
                 .Property(p => p.Id)
