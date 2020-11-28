@@ -31,7 +31,7 @@ namespace ControlProduct
 
             var connectionString = Configuration.GetConnectionString("ControlProduct");
 
-            services.AddDbContext<BaseContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<BaseContext>(options => options.UseNpgsql(connectionString));
 
             services.AddScoped(typeof(BaseRepository<>));
             services.AddScoped(typeof(BaseServices));
