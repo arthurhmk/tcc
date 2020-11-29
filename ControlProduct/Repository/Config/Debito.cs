@@ -19,6 +19,16 @@ namespace ControlProduct.Repository.Config
                 .Property(p => p.Data)
                 .HasColumnName("dt_debito");
 
+
+            builder
+                .Property(p => p.Entrada)
+                .HasColumnName("vl_entrada");
+
+
+            builder
+                .Property(p => p.Saida)
+                .HasColumnName("vl_saida");
+
             builder
                 .Property(p => p.Valor)
                 .HasColumnName("vl_debito");

@@ -1,0 +1,32 @@
+﻿@model Debito
+@{
+    ViewData["Title"] = "Novo Debito";
+}
+
+<div class="text-center mb-3">
+    <h1 class="display-4">Cadastro de Débito</h1>
+</div>
+
+<div class="row justify-content-md-center">
+    <div class="col-10 border rounded shadow-sm p-3">
+        <form asp-action="CadastroDebito" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="Entrada"></label>
+                <input asp-for="Entrada" class="form-control currency" type="number"/>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Saida"></label>
+                <input asp-for="Saida" class="form-control currency" type="number"/>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary">Cadastrar Debito</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+

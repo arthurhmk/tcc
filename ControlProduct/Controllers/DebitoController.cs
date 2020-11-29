@@ -17,7 +17,6 @@ namespace ControlProduct.Controllers
     public class DebitoController : BaseController
     {
         BaseRepository<Debito> _repoDebito;
-
         public DebitoController(BaseServices serv, 
             BaseRepository<Debito> repoDebito)
             :base(serv)
@@ -30,6 +29,34 @@ namespace ControlProduct.Controllers
         {
             var debitos =  await _repoDebito.Entity.AsNoTracking().OrderBy(p=> p.Id).ToListAsync();
             return View(debitos);
+        }
+
+        [Route("novo-debito")]
+        public async Task<IActionResult> CadastroDebito(int? idDebito)
+        {
+            if (idDebito != null)
+            {
+                var debitos = await _repoDebito.Entity.FindAsync(idDebito);
+                if (debitos != null)
+                    return View(debitos);
+            }
+            return View(new Debito());
+        }
+
+        [HttpPost]
+        [Route("novo-debito")]
+        public async Task<IActionResult> CadastroDebito(Debito debito)
+        {
+            if (ModelState.IsValid)
+            {
+                if (debito.Id != 0)
+                    await _repoDebito.Update(debito);
+                else
+                    await _repoDebito.Insert(debito);
+                return RedirectToAction(nameof(Index));
+            }
+
+            throw new Exception("Débito inválido");
         }
     }
 }
