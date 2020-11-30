@@ -1,4 +1,4 @@
-﻿--DROP TABLE debito;
+﻿DROP TABLE debito;
 DROP TABLE pedido_produto;
 DROP TABLE produto;
 DROP TABLE categoria;
