@@ -34,11 +34,14 @@ namespace ControlProduct.Controllers
         [Route("nova-categoria")]
         public async Task<IActionResult> CadastroCategoria(int? idCategoria)
         {
+            var categorias = await _repoCategoria.Entity.AsNoTracking().Where(p=>p.Id != idCategoria.GetValueOrDefault()).Include(p=>p.Produtos).ToListAsync();
+            ViewBag.categorias = categorias;
+
             if(idCategoria != null)
             {
-                var categorias = await _repoCategoria.Entity.FindAsync(idCategoria);
-                if (categorias != null)
-                    return View(categorias);
+                var categoria = await _repoCategoria.Entity.FindAsync(idCategoria);
+                if (categoria != null)
+                    return View(categoria);
             }
             return View(new Categoria());
         }
@@ -53,7 +56,7 @@ namespace ControlProduct.Controllers
                     await _repoCategoria.Update(categoria);
                 else
                     await _repoCategoria.Insert(categoria);
-                return RedirectToAction(nameof(Index));
+                return Json(new { route = "/categoria" });
             }
 
             throw new Exception("Categoria inválida");

@@ -357,7 +357,7 @@
         let preco = produtos.reduce((acc, x) => acc + x.valor * x.qtde, 0)
         let entregaPreco = $("#ValorEntrega").val();
         if (entregaPreco != undefined)
-            preco += entregaPreco.split(" ")[1] * 1;
+            preco += entregaPreco.split("$")[1] * 1;
         $(".precoTotal").html("Total: " + precoDesc(preco));
         $(".produtoQtde").html(produtos.length);
     }

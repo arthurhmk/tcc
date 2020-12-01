@@ -60,6 +60,12 @@ namespace ControlProduct.Controllers
             ViewBag.categorias = categorias;
             ViewBag.clientes = clientes;
 
+            if (!clientes.Any())
+                return RedirectToAction(nameof(WarnController.Cliente), "error");
+
+            if (!categorias.SelectMany(p=>p.Produtos).Any())
+                return RedirectToAction(nameof(WarnController.Produto), "error");
+
             if (idPedido != null)
             {
                 var pedidos = await _repoPedido.Entity.AsNoTracking().Where(p => p.Id == idPedido).Include(p=>p.PedidoProdutos).Include(p=>p.Pagamentos).ToListAsync();

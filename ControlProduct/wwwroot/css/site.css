@@ -129,7 +129,7 @@ body {
 }
 .nav-link{
     padding-right:1rem!important;
-    padding-right:1rem!important;
+    padding-left:1rem!important;
 }
 body .container{
     width:100%;
@@ -159,6 +159,8 @@ table{
 .navbar {
     background-color: #2e6ca1;
     color: white;
+    min-height: 80px;
+    height: unset;
 }
     .navbar a:hover {
         color: #f6eb9b;

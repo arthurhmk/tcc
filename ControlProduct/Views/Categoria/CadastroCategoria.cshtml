@@ -16,9 +16,11 @@
                 <label asp-for="Nome"></label>
                 <input asp-for="Nome" class="form-control" />
             </div>
+            
 
-            <div class="form-group">
-                <button class="btn btn-primary">Cadastrar Categoria</button>
+            <div class="form-group mb-4">
+                <label>Produtos do Pedido</label><br />
+                <a class="btn btn-outline-primary modal-trigger" style="cursor:pointer" href="#modalProduto">Cadastrar Produtos</a>
             </div>
 
             <button type="submit" class="btn btn-primary">@(Model.Id != 0 ? "Atualizar" : "Cadastrar")</button>
@@ -30,20 +32,92 @@
     </div>
 </div>
 
+<div id="modalProduto" class="modal custom-modal shadow-sm rounded border">
+    <div class="row">
+        <div class="col-5 border-right p-3">
+            <h4>Lista de Produtos</h4>
+            @{
+                var categorias = (List<Categoria>)ViewBag.categorias;
+            }
+            @if (categorias.Any())
+            {
+                <div id="categoriasList" class="row">
+                    @for (var i = 0; i < categorias.Count; i++)
+                    {
+                        <div class="col-4 categoriaButton collapsed p-1" data-toggle="collapse" data-target="#cat@(i)" aria-expanded="false" aria-controls="cat@(i)">
+                            <span class="btn btn-outline-primary w-100">
+                                @categorias[i].Nome
+                            </span>
+                        </div>
+
+                        <div id="cat@(i)" class="collapse collapsed col-12 produtosList" data-parent="#categoriasList">
+                            <div class="card-body">
+                                @if (categorias[i].Produtos.Where(p => p.Ativo == ControlProduct.Models.Enum.EstadoProduto.ATIVO).Any())
+                                {
+                                    @foreach (var prod in categorias[i].Produtos.Where(p => p.Ativo == ControlProduct.Models.Enum.EstadoProduto.ATIVO))
+                                    {
+                                        <span class="waves-effect waves-teal btn-small btn-flat" style="width:100%" onclick="addProduto(@prod.Id, `@prod.Nome`)">@prod.Nome</span><br />
+                                        <hr />
+                                    }
+                                }
+                                else
+                                {
+                                    <i>Não há produtos nesta categoria</i><br />
+                                    <hr />
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <i>Não há outras categorias cadastradas</i><br />
+            }
+        </div>
+        <div class="col-7 p-3">
+            <h4>Produtos da categoria</h4>
+
+            <div id="listaProduto">
+                <div class="row produto">
+                    <div class="col-12 col-xl-6 d-flex">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x-circle-fill produto-remove-button" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                        </svg>
+                        <span class="form-control text-center produtoDesc" style="margin:auto">Prod 1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     window.addEventListener("load", function () {
-        @*$.ajax({
-            url: "buscar-super-categorias",
-            method: "post",
-            data: {
-                idCategoria: @Model.Id
-            }
-        })
-        .done(function( data ) {
-            console.log(data);
-            data.forEach(function (obj) {
-                $("#SuperCategoriaId").append(`<option value='${obj.id}'>${obj.nome}</option>`);
+        $('.modal').modal();
+
+        $("form").submit(function (e) {
+            e.preventDefault();
+            let data = getFormData($(this));
+
+            $.ajax({
+                url: $(this).attr("action"),
+                method: "post",
+                data: data
             })
-        });*@
+                .done(function (d) {
+                    $("#messageBox").find("h4").html("Sucesso!");
+                    $("#messageBox").modal({ dismissible: false });
+                    $("#messageBox").find("p").html("Categoria registrada com sucesso.<br>Redirecionando para a página principal...");
+                    M.Modal.getInstance($("#messageBox")[0]).open()
+
+                    setTimeout(function(){ window.location.href = d.route; }, 2000);
+                })
+                .fail(function (d) {
+                    $("#messageBox").find("h4").html("Um erro ocorreu!");
+                    $("#messageBox").find("p").html("Não foi possível registrar a categoria.<br>Verifique os dados e tente novamente.");
+                    M.Modal.getInstance($("#messageBox")[0]).open()
+                });
+        });
     });
 </script>

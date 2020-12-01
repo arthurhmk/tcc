@@ -40,7 +40,11 @@ namespace ControlProduct.Controllers
         {
             var categorias = await _repoCategoria.Entity.AsNoTracking().ToListAsync();
             ViewBag.categorias = categorias;
-            if(idProduto != null)
+
+            if (!categorias.Any())
+                return RedirectToAction(nameof(WarnController.Categoria), "error");
+
+            if (idProduto != null)
             {
                 var produtos = await _repoProduto.Entity.AsNoTracking().Include(p => p.Categoria).Where(p => p.Id == idProduto).ToListAsync();
                 if (produtos.Any())
