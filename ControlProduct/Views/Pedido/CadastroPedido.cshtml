@@ -31,7 +31,7 @@
 
             <div class="form-group">
                 <label asp-for="DataEntrega"></label>
-                <input asp-for="DataEntrega" value="@(Model.DataEntrega == null ? "" : Model.DataEntrega.GetValueOrDefault().ToString("yyyy-MM-dd") )" type="date" class="form-control datepicker" />
+                <input asp-for="DataEntrega" value="@(Model.DataEntrega == null ? "" : Model.DataEntrega.ToString("yyyy-MM-dd") )" type="date" class="form-control" />
             </div>
 
             <div class="form-group">
@@ -341,7 +341,7 @@
         return nome+ " - " + precoDesc(vl)
     }
     function precoDesc(vl) {
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(vl)
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(vl).replace(String.fromCharCode(160), "")
     }
 
     function removeProduto(id) {
