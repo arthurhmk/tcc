@@ -60,15 +60,19 @@ namespace ControlProduct.Controllers
                 List<double> listaPedidoExtra = new List<double>();
 
                 var pedidos = _repoPedido.Entity.AsNoTracking().Where(p => p.Estado == EstadoPedido.PAGO 
-                                                                        && p.DataEntrega <= debito.Data)
+                                                                        && p.DataEntrega <= debito.Data
+                                                                        && p.DataEntrega.Month == debito.Data.Month)
                                                                         .ToListAsync()
                                                                         .Result;
 
                 listaPedidoExtra.AddRange(pedidos.Select(u => u.Valor));
 
-                pedidos.ForEach(pe =>
-                {
-                    listaPedidoExtra.AddRange(_repoPedidoExtra.Entity.Where(p => p.Id == pe.Id).Select(u => u.Valor));
+                pedidos.ForEach(pe => {
+                    listaPedidoExtra.AddRange(
+                        _repoPedidoExtra.Entity.AsNoTracking()
+                            .Where(p => p.Id == pe.Id)
+                            .Select(u => u.Valor)
+                    );
                 });
 
                 debito.Entrada = (decimal)listaPedidoExtra.Sum();
