@@ -21,13 +21,15 @@ namespace ControlProduct.Controllers
         BaseRepository<Produto> _repoProduto;
         BaseRepository<Cliente> _repoCliente;
         BaseRepository<PedidoProduto> _repoPedidoProduto;
+        BaseRepository<PedidoExtra> _repoExtra;
 
         public PedidoController(BaseServices serv, 
             BaseRepository<Pedido> repoPedido,
             BaseRepository<Categoria> repoCategoria,
             BaseRepository<Produto> repoProduto,
             BaseRepository<Cliente> repoCliente,
-            BaseRepository<PedidoProduto> repoPedidoProduto)
+            BaseRepository<PedidoProduto> repoPedidoProduto,
+            BaseRepository<PedidoExtra> repoExtra)
             :base(serv)
         {
             _repoPedido = repoPedido;
@@ -35,6 +37,7 @@ namespace ControlProduct.Controllers
             _repoProduto = repoProduto;
             _repoCliente = repoCliente;
             _repoPedidoProduto = repoPedidoProduto;
+            _repoExtra = repoExtra;
         }
 
         [Route("")]
@@ -44,6 +47,7 @@ namespace ControlProduct.Controllers
                 .Include(p=> p.Cliente)
                 .Include(p=> p.Pagamentos)
                 .Include(p=> p.PedidoProdutos).ThenInclude(p=> p.Produto)
+                .Include(p=> p.Extras)
                 .OrderBy(p=> p.Id).ToListAsync();
             var model = pedidos.Select(p => new PedidoViewModel(p)).OrderByDescending(p=>p.Id).ToList();
 
@@ -68,7 +72,11 @@ namespace ControlProduct.Controllers
 
             if (idPedido != null)
             {
-                var pedidos = await _repoPedido.Entity.AsNoTracking().Where(p => p.Id == idPedido).Include(p=>p.PedidoProdutos).Include(p=>p.Pagamentos).ToListAsync();
+                var pedidos = await _repoPedido.Entity.AsNoTracking()
+                    .Include(p => p.PedidoProdutos)
+                    .Include(p => p.Pagamentos)
+                    .Include(p=> p.Extras)
+                    .Where(p => p.Id == idPedido).ToListAsync();
                 if (pedidos.Any())
                     return View(pedidos.First());
             }
@@ -80,17 +88,25 @@ namespace ControlProduct.Controllers
         [Route("novo-pedido")]
         public async Task<IActionResult> CadastroPedido(Pedido pedido)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && (pedido.PedidoProdutos != null || pedido.Extras != null))
             {
-                pedido.PedidoProdutos.ForEach(p => p.Pedido = pedido);
+                if (pedido.PedidoProdutos != null)
+                    pedido.PedidoProdutos.ForEach(p => p.Pedido = pedido);
+
+                if (pedido.Extras != null)
+                    pedido.Extras.ForEach(p => p.Pedido = pedido);
+
                 if (pedido.Pagamentos != null)
-                {
                     pedido.Pagamentos.ForEach(p => p.Pedido = pedido);
-                }
 
                 if (pedido.Id != 0)
                 {
-                    var oldPedido = await _repoPedido.Entity.AsNoTracking().Include(p=>p.PedidoProdutos).ThenInclude(p=>p.Produto).Include(p=>p.Pagamentos).Where(p=>p.Id == pedido.Id).ToListAsync();
+                    var oldPedido = await _repoPedido.Entity.AsNoTracking()
+                        .Include(p=>p.PedidoProdutos).ThenInclude(p=>p.Produto)
+                        .Include(p=>p.Pagamentos)
+                        .Include(p=>p.Extras)
+                        .Where(p=>p.Id == pedido.Id).ToListAsync();
+
                     if (oldPedido.Any())
                     {
                         if(pedido.Pagamentos != null && oldPedido.First().Pagamentos.Any())
@@ -98,19 +114,41 @@ namespace ControlProduct.Controllers
                             pedido.Pagamentos.First().Id = oldPedido.First().Pagamentos.First().Id;
                         }
 
-                        //Atrubuir o Id de produtos já cadastrados no pedido
-                        PedidoProduto temp;
-                        pedido.PedidoProdutos.ForEach(p => p.Id = (temp = oldPedido.First().PedidoProdutos.FirstOrDefault(q => q.IdProduto == p.IdProduto)) == null? 0 : temp.Id);
+                        if (pedido.PedidoProdutos != null)
+                        {
+                            //Atribuir o Id de produtos já cadastrados no pedido
+                            PedidoProduto temp;
+                            pedido.PedidoProdutos.ForEach(p => p.Id = (temp = oldPedido.First().PedidoProdutos.FirstOrDefault(q => q.IdProduto == p.IdProduto)) == null ? 0 : temp.Id);
+                        }
+                        if (pedido.Extras != null)
+                        {
+                            PedidoExtra temp;
+                            pedido.Extras.ForEach(p => p.Id = (temp = oldPedido.First().Extras.FirstOrDefault(q => q.Id == p.Id)) == null ? 0 : temp.Id);
+                        }
+
 
                         pedido.DataPedido = oldPedido.First().DataPedido;
-                        await _repoPedido.Update(pedido);
+                         await _repoPedido.Update(pedido);
 
-                        var produtosRemover = oldPedido.First().PedidoProdutos.Where(p => !pedido.PedidoProdutos.Select(q => q.IdProduto).Contains(p.IdProduto));
-                        foreach(var pr in produtosRemover)
+
+                        if (pedido.PedidoProdutos != null)
                         {
-                            pr.Produto = null;
-                            pr.Pedido = null;
-                            await _repoPedidoProduto.Delete(pr);
+                            var produtosRemover = oldPedido.First().PedidoProdutos.Where(p => !pedido.PedidoProdutos.Select(q => q.IdProduto).Contains(p.IdProduto));
+                            foreach (var pr in produtosRemover)
+                            {
+                                pr.Produto = null;
+                                pr.Pedido = null;
+                                await _repoPedidoProduto.Delete(pr);
+                            }
+                        }
+                        if (pedido.Extras != null)
+                        {
+                            var extrasRemover = oldPedido.First().Extras.Where(p => !pedido.Extras.Select(q => q.Id).Contains(p.Id));
+                            foreach (var pr in extrasRemover)
+                            {
+                                pr.Pedido = null;
+                                await _repoExtra.Delete(pr);
+                            }
                         }
                     }
                 }
@@ -130,7 +168,7 @@ namespace ControlProduct.Controllers
         {
             if (idPedido != null)
             {
-                var pedido = await _repoPedido.Entity.Include(p=>p.PedidoProdutos).Where(p=>p.Id == idPedido).ToListAsync();
+                var pedido = await _repoPedido.Entity.Include(p=>p.PedidoProdutos).Include(p=>p.Extras).Where(p=>p.Id == idPedido).ToListAsync();
                 if (pedido != null)
                 {
                     await _repoPedido.Delete(pedido.First());

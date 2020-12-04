@@ -34,7 +34,11 @@
                     <tr>
                         <td>@pedido.Cliente</td>
                         <td>
-                            <button class="btn btn-primary" onclick='abrirListaProdutos(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(pedido.Pedido)))'>@pedido.Pedido.Count Produto(s)</button>
+                            <button class="btn btn-primary" 
+                                    onclick='abrirListaProdutos(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(pedido.Pedido)),
+                                                                @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(pedido.Extras)))'>
+                                @(pedido.Pedido.Count + pedido.Extras.Count) Produto(s)
+                            </button>
                         </td>
                         <td class="moneyMask">@pedido.Valor</td>
                         <td>@pedido.DataPedido</td>
@@ -91,10 +95,14 @@
             $(".modal").modal();
         });
 
-        function abrirListaProdutos(produtos) {
+        function abrirListaProdutos(produtos, extras) {
             $("#modalProduto").find(".listaProdutos").html("");
             for (let i in produtos) {
                 prodElem = $(`<span class="form-control text-center"><b class="mr-3">Quantidade: ${produtos[i].Quantidade}</b>${prodDesc(produtos[i].Nome, produtos[i].Valor)}</span></br>`);
+                $("#modalProduto").find(".listaProdutos").append(prodElem);
+            }
+            for (let i in extras) {
+                prodElem = $(`<span class="form-control text-center">${prodDesc(extras[i].Nome, extras[i].Valor)}</span></br>`);
                 $("#modalProduto").find(".listaProdutos").append(prodElem);
             }
             M.Modal.getInstance($("#modalProduto")[0]).open()

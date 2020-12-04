@@ -18,11 +18,13 @@ namespace ControlProduct.Models.ViewModel
             Status = EstadoEnumToString(pedido.Estado);
             StatusEnum = pedido.Estado;
             ValorPago = pedido.Pagamentos.Aggregate(0D, (acc, x) => acc + x.Valor);
+            Extras = pedido.Extras.Select(p => new ProdutoExtraViewModel(p)).ToList();
         }
 
         public int Id { get; set; }
         public string Cliente { get; set; }
         public List<ProdutoPedidoViewModel> Pedido { get; set; }
+        public List<ProdutoExtraViewModel> Extras { get; set; }
         public double Valor { get; set; }
         public string DataPedido { get; set; }
         public string DataEntrega { get; set; }
