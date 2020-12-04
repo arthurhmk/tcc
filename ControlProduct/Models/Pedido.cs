@@ -26,7 +26,7 @@ namespace ControlProduct.Models
 
         [Required(ErrorMessage = "Esse campo é obrigatório.")]
         [DisplayName("Data de Entrega")]
-        public DateTime? DataEntrega { get; set; }
+        public DateTime DataEntrega { get; set; }
 
         [Required(ErrorMessage = "Esse campo é obrigatório.")]
         [DisplayName("Forma de recebimento do pedido")]

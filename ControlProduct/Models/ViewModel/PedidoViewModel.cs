@@ -13,7 +13,7 @@ namespace ControlProduct.Models.ViewModel
             Valor = pedido.Valor;
             Pedido = pedido.PedidoProdutos.Select(p => new ProdutoPedidoViewModel(p.Produto, p.Quantidade)).ToList();
             DataPedido = pedido.DataPedido.ToString("yyyy-MM-dd");
-            DataEntrega = pedido.DataEntrega.GetValueOrDefault().ToString("yyyy-MM-dd");
+            DataEntrega = pedido.DataEntrega.ToString("yyyy-MM-dd");
             LocalEntrega = pedido.EnderecoEntrega?? "A retirar";
             Status = EstadoEnumToString(pedido.Estado);
             StatusEnum = pedido.Estado;

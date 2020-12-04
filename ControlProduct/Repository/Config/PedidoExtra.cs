@@ -26,7 +26,7 @@ namespace ControlProduct.Repository.Config
 
             builder
                 .Property(p => p.Valor)
-                .HasColumnName("vl_pagamento")
+                .HasColumnName("vl_extra")
                 .HasConversion(
                     p => (decimal)p,
                     p => decimal.ToDouble(p)
