@@ -62,7 +62,7 @@ function setMoneyMask() {
     $(".moneyMask").inputmask('decimal', {
         'rightAlign': false,
         'alias': 'numeric',
-        'groupSeparator': ',',
+        'groupSeparator': '',
         'autoGroup': true,
         'digits': 2,
         'radixPoint': ".",

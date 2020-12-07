@@ -6,3 +6,4 @@ DROP TABLE pedido_extra;
 DROP TABLE pedido;
 DROP TABLE cliente;
 DROP TABLE pagamento;
+DROP TABLE usuario;

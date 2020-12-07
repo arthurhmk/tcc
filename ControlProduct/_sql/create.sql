@@ -138,3 +138,16 @@ CREATE TABLE debito (
   vl_saida DECIMAL(10,2) NOT NULL,
   PRIMARY KEY (cd_debito))
 ;
+
+-- -----------------------------------------------------
+-- Table usuario
+-- -----------------------------------------------------
+CREATE TABLE usuario (
+  cd_usuario INT NOT NULL IDENTITY(1,1),
+  cd_token VARCHAR(64),
+  ds_senha VARCHAR(64) NOT NULL,
+  PRIMARY KEY (cd_usuario))
+;
+
+INSERT INTO usuario(ds_senha)
+    VALUES ('ea05a611e65c96386054319696d0a742443046545666662c90ffde4d644d46af');
