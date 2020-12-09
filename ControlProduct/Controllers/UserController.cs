@@ -73,11 +73,39 @@ namespace ControlProduct.Controllers
             return RedirectToAction(nameof(UserController.Index), "User");
         }
 
-
+        [HttpGet]
         [Route("password")]
-        public async Task<IActionResult> TrocarSenha(User user)
+        public async Task<IActionResult> TrocarSenha()
         {
-            return null;
+            return View();
+        }
+
+        [HttpPost]
+        [Route("password")]
+        public async Task<IActionResult> TrocarSenha(string oldpass, string newpass, string repetir)
+        {
+
+            if (newpass.Length > 6 && newpass == repetir)
+            {
+                using SHA256 sha256 = SHA256.Create();
+                StringBuilder hash = new StringBuilder();
+                foreach (byte b in sha256.ComputeHash(Encoding.UTF8.GetBytes(oldpass)))
+                    hash.AppendFormat("{0:X2}", b);
+
+                var user = await _repoUser.Entity.AsNoTracking().Where(p => p.Senha == hash.ToString()).ToListAsync();
+                if (user.Any())
+                {
+                    hash.Clear();
+                    foreach (byte b in sha256.ComputeHash(Encoding.UTF8.GetBytes(newpass)))
+                        hash.AppendFormat("{0:X2}", b);
+
+                    user.First().Senha = hash.ToString();
+                    await _repoUser.Update(user.First());
+                    return Json(new { route = "/" });
+                }
+            }
+
+            throw new Exception("Senha inválida");
         }
     }
 }
