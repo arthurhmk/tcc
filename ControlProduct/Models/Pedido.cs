@@ -10,6 +10,9 @@ namespace ControlProduct.Models
     {
         public Pedido()
         {
+            DataEntrega = DateTime.Now;
+            TipoEntrega = TipoEntrega.BUSCA;
+            Estado = EstadoPedido.PAGO;
         }
 
         public int Id { get; set; }

@@ -385,7 +385,7 @@
         return nome + " - " + precoDesc(vl);
     }
     function precoDesc(vl) {
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(vl).replace(String.fromCharCode(160), "")
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(vl).replace(String.fromCharCode(160), "").replace(".", "");
     }
 
     function removeProduto(id) {
