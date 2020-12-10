@@ -172,3 +172,19 @@ table{
 .dropdown-item:hover {
     color: #333!important;
 }
+.error-item{
+
+}
+.input-validation-error {
+    border-color: #dc3545 !important;
+}
+    .input-validation-error:focus {
+        box-shadow: 0 1px 0 0 #dc3545 !important;
+    }
+
+.loading{
+    position:fixed;
+    bottom:32px;
+    left:-2px;
+    background-color:white;
+}

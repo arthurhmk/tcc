@@ -1,4 +1,4 @@
-﻿@model  Cliente
+﻿@model Cliente
 @{
     ViewData["Title"] = "Novo Cliente";
 }
@@ -13,7 +13,7 @@
             Os campos abaixo deverão ser preenchidos com as informações sobre o cliente.
         </p>
 
-        <form asp-action="CadastroCliente" method="post">
+        <form asp-action="CadastroCliente" method="post" autocomplete="off">
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group">
@@ -46,6 +46,59 @@
             {
                 <a asp-action="RemoverCliente" asp-route-idCliente="@Model.Id" class="btn btn-danger">Excluir</a>
             }
+
+            <div class="error-list pt-3"></div>
         </form>
     </div>
 </div>
+
+
+@section scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<script>
+    window.addEventListener("load", function () {
+        $("#Telefone").inputmask("(99[9]) 9999[9]-9999", {greedy:false});
+        $('.modal').modal();
+
+        $("form").submit(function (e) {
+            e.preventDefault();
+            $(this).validate().form();
+            var errorList = $(this).validate().errorList;
+
+            if (!errorList.length) {
+                let data = getFormData($(this));
+                $(".loading").removeClass("d-none");
+
+                $.ajax({
+                    url: $(this).attr("action"),
+                    method: "post",
+                    data: data
+                })
+                    .done(function (d) {
+                        $("#messageBox").find("h4").html("Sucesso!");
+                        $("#messageBox").modal({ dismissible: false });
+                        $("#messageBox").find("p").html("Cliente registrado com sucesso.<br>Redirecionando para a página principal...");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+
+                        setTimeout(function () { window.location.href = d.route; }, 2000);
+                    })
+                    .fail(function (d) {
+                        $("#messageBox").find("h4").html("Um erro ocorreu!");
+                        $("#messageBox").find("p").html("Não foi possível cadastrar o cliente.<br>Verifique os dados e tente novamente.");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+                    })
+                    .always(function (d) {
+                        $(".loading").addClass("d-none");
+                    });
+            }
+            else {
+                $(".error-list").html("");
+                for (var i in errorList) {
+                    $(".error-list").append(`<p class='error-item text-danger'>${errorList[i].message}</p>`);
+                }
+            }
+        });
+    });
+</script>

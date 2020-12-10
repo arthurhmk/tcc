@@ -1,4 +1,4 @@
-﻿@model  User
+﻿@model User
 @{
     ViewData["Title"] = "Login";
 }
@@ -16,13 +16,20 @@
                 <input asp-for="Senha" class="form-control" type="password" />
             </div>
 
-
             <div class="form-group text-center">
                 <button type="submit" class="btn btn-primary">Entrar</button>
             </div>
+
+            <div class="error-list pt-3"></div>
         </form>
     </div>
 </div>
+
+
+@section scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+
 
 <script>
     window.addEventListener("load", function () {
@@ -30,27 +37,42 @@
 
         $("form").submit(function (e) {
             e.preventDefault();
-            let data = getFormData($(this));
+            $(this).validate().form();
+            var errorList = $(this).validate().errorList;
 
-            $.ajax({
-                url: $(this).attr("action"),
-                method: "post",
-                data: data
-            })
-                .done(function (d) {
-                    $("#messageBox").find("h4").html("Sucesso!");
-                    $("#messageBox").modal({ dismissible: false });
-                    $("#messageBox").find("p").html("Autenticação concluída.<br>Redirecionando para a página principal...");
-                    M.Modal.getInstance($("#messageBox")[0]).open();
-                    Cookies.set('user-token', d.token);
+            if (!errorList.length) {
+                let data = getFormData($(this));
+                $(".loading").removeClass("d-none");
 
-                    setTimeout(function () { window.location.href = d.route; }, 2000);
+                $.ajax({
+                    url: $(this).attr("action"),
+                    method: "post",
+                    data: data
                 })
-                .fail(function (d) {
-                    $("#messageBox").find("h4").html("Um erro ocorreu!");
-                    $("#messageBox").find("p").html("A senha informada não é válida.");
-                    M.Modal.getInstance($("#messageBox")[0]).open()
-                });
+                    .done(function (d) {
+                        $("#messageBox").find("h4").html("Sucesso!");
+                        $("#messageBox").modal({ dismissible: false });
+                        $("#messageBox").find("p").html("Autenticação concluída.<br>Redirecionando para a página principal...");
+                        M.Modal.getInstance($("#messageBox")[0]).open();
+                        Cookies.set('user-token', d.token);
+
+                        setTimeout(function () { window.location.href = d.route; }, 2000);
+                    })
+                    .fail(function (d) {
+                        $("#messageBox").find("h4").html("Um erro ocorreu!");
+                        $("#messageBox").find("p").html("A senha informada não é válida.");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+                    })
+                    .always(function (d) {
+                        $(".loading").addClass("d-none");
+                    });
+            }
+            else {
+                $(".error-list").html("");
+                for (var i in errorList) {
+                    $(".error-list").append(`<p class='error-item text-danger'>${errorList[i].message}</p>`);
+                }
+            }
         });
     });
 </script>

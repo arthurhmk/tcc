@@ -53,7 +53,7 @@ namespace ControlProduct.Controllers
                     await _repoCliente.Update(cliente);
                 else
                     await _repoCliente.Insert(cliente);
-                return RedirectToAction(nameof(Index));
+                return Json(new { route = "/cliente" });
             }
 
             throw new Exception("Cliente inválido");

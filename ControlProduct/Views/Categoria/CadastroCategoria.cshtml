@@ -8,15 +8,18 @@
 </div>
 
 <div class="row justify-content-md-center">
-    <div class="col-10 border rounded shadow-sm p-3">
-        <form asp-action="CadastroCategoria" method="post">
+    <div class="col-12 col-sm-10 border rounded shadow-sm p-3">
+        <p class="text-muted">
+            Escolha um nome único para a categoria.
+        </p>
+        <form asp-action="CadastroCategoria" method="post" autocomplete="off">
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group">
                 <label asp-for="Nome"></label>
                 <input asp-for="Nome" class="form-control" />
             </div>
-            
+
 
             <div class="form-group mb-4">
                 <label>Produtos do Pedido</label><br />
@@ -28,6 +31,8 @@
             {
                 <a asp-action="RemoverCategoria" asp-route-idCategoria="@Model.Id" class="btn btn-danger">Excluir</a>
             }
+
+            <div class="error-list pt-3"></div>
         </form>
     </div>
 </div>
@@ -92,32 +97,80 @@
     </div>
 </div>
 
+@section scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+
 <script>
+    var produtos = []
     window.addEventListener("load", function () {
         $('.modal').modal();
 
         $("form").submit(function (e) {
             e.preventDefault();
-            let data = getFormData($(this));
+            $(this).validate().form();
+            var errorList = $(this).validate().errorList;
 
-            $.ajax({
-                url: $(this).attr("action"),
-                method: "post",
-                data: data
-            })
-                .done(function (d) {
-                    $("#messageBox").find("h4").html("Sucesso!");
-                    $("#messageBox").modal({ dismissible: false });
-                    $("#messageBox").find("p").html("Categoria registrada com sucesso.<br>Redirecionando para a página principal...");
-                    M.Modal.getInstance($("#messageBox")[0]).open()
-
-                    setTimeout(function(){ window.location.href = d.route; }, 2000);
+            if (!errorList.length) {
+                let data = getFormData($(this));
+                $(".loading").removeClass("d-none");
+                $.ajax({
+                    url: $(this).attr("action"),
+                    method: "post",
+                    data: data
                 })
-                .fail(function (d) {
-                    $("#messageBox").find("h4").html("Um erro ocorreu!");
-                    $("#messageBox").find("p").html("Não foi possível registrar a categoria.<br>Verifique os dados e tente novamente.");
-                    M.Modal.getInstance($("#messageBox")[0]).open()
-                });
+                    .done(function (d) {
+                        $("#messageBox").find("h4").html("Sucesso!");
+                        $("#messageBox").modal({ dismissible: false });
+                        $("#messageBox").find("p").html("Categoria registrada com sucesso.<br>Redirecionando para a página principal...");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+
+                        setTimeout(function () { window.location.href = d.route; }, 2000);
+                    })
+                    .fail(function (d) {
+                        $("#messageBox").find("h4").html("Um erro ocorreu!");
+                        $("#messageBox").find("p").html("Não foi possível registrar a categoria.<br>Verifique os dados e tente novamente.");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+                    })
+                    .always(function (d) {
+                        $(".loading").addClass("d-none");
+                    });
+            }
+            else {
+                $(".error-list").html("");
+                for (var i in errorList) {
+                    $(".error-list").append(`<p class='error-item text-danger'>${errorList[i].message}</p>`);
+                }
+            }
         });
     });
+
+
+    function addProduto(id, nome) {
+        if (!produtos.filter(p => p.id == id).length) {
+            produtos.push({ "id": id, "nome": nome })
+
+            //let newPedidoProduto = produtoPedido.clone();
+            //$(newPedidoProduto).attr("id","pedidoProduto" + id);
+            //$(newPedidoProduto).find("svg").click(function () {
+            //    removeProduto(id)
+            //});
+            //$(newPedidoProduto).find(".produtoPedidoDesc").html(prodDesc(nome, valor))
+            //$(newPedidoProduto).find(".produtoPedidoQtde").val(qtde);
+            //$(newPedidoProduto).find(".produtoPedidoQtde").change(function () {
+            //    changeQtde(id, $(this).val())
+            //});
+
+            //$("#listaProdutoPedido").append(newPedidoProduto);
+        }
+    }
+
+    function removeProduto(id) {
+        let remover = produtos.filter(p => p.id == id);
+        if (remover.length) {
+            produtos.splice(produtos.indexOf(remover[0]), 1);
+            //$("#pedidoProduto" + id).remove();
+        }
+        updateTotal();
+    }
 </script>

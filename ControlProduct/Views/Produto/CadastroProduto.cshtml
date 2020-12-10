@@ -9,7 +9,7 @@
 
 <div class="row justify-content-md-center">
     <div class="col-10 border rounded shadow-sm p-3">
-        <form asp-action="CadastroProduto" method="post">
+        <form asp-action="CadastroProduto" method="post" autocomplete="off">
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group">
@@ -32,14 +32,14 @@
                     var selectlist = Html.GetEnumSelectList<ControlProduct.Models.Enum.EstadoProduto>().ToList();
                 }
                 <label asp-for="Ativo"></label>
-                <select id="Ativo" name="Ativo" asp-items="selectlist" >
+                <select id="Ativo" name="Ativo" asp-items="selectlist">
                 </select>
             </div>
 
             <div class="form-group">
                 @{
                     var categorias = (List<Categoria>)ViewBag.categorias;
-                    var selectlistCategorias = categorias.Select(p => new SelectListItem(p.Nome,p.Id.ToString()));
+                    var selectlistCategorias = categorias.Select(p => new SelectListItem(p.Nome, p.Id.ToString()));
                     foreach (var selecteditem in selectlistCategorias)
                     {
                         if (selecteditem.Value == Model.CategoriaId.ToString())
@@ -56,47 +56,76 @@
             {
                 <a asp-action="RemoverProduto" asp-route-idProduto="@Model.Id" class="btn btn-danger">Excluir</a>
             }
+
+            <div class="error-list pt-3"></div>
         </form>
     </div>
 </div>
+
+
+@section scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+
 
 <script>
     window.addEventListener("load", function () {
         $('select').formSelect();
 
         $("#Quantidade").inputmask('integer', {
-                'rightAlign': false,
-                'allowMinus': false,
-                'placeholder': '0'
+            'rightAlign': false,
+            'allowMinus': true,
+            'placeholder': '0'
         });
         setMoneyMask();
         $('.modal').modal();
+        this.setTimeout(function () {
+            $("input").each(function () {
+                $(this).rules('remove', 'number');
+            });
+        }, 1000);
 
         $("form").submit(function (e) {
             e.preventDefault();
-            let data = getFormData($(this));
-            if (data.Valor) {
-                data.Valor = data.Valor.split("$")[1] * 1;
-            }
+            $(this).validate().form();
+            var errorList = $(this).validate().errorList;
 
-            $.ajax({
-                url: $(this).attr("action"),
-                method: "post",
-                data: data
-            })
-                .done(function (d) {
-                    $("#messageBox").find("h4").html("Sucesso!");
-                    $("#messageBox").modal({ dismissible: false });
-                    $("#messageBox").find("p").html("Cadastro do produto realizado.<br>Redirecionando para a página principal...");
-                    M.Modal.getInstance($("#messageBox")[0]).open()
+            if (!errorList.length) {
+                let data = getFormData($(this));
+                $(".loading").removeClass("d-none");
 
-                    setTimeout(function(){ window.location.href = d.route; }, 2000);
+                if (data.Valor) {
+                    data.Valor = data.Valor.split("$")[1] * 1;
+                }
+
+                $.ajax({
+                    url: $(this).attr("action"),
+                    method: "post",
+                    data: data
                 })
-                .fail(function (d) {
-                    $("#messageBox").find("h4").html("Um erro ocorreu!");
-                    $("#messageBox").find("p").html("Não foi possível cadastrar o produto.<br>Verifique os dados e tente novamente.");
-                    M.Modal.getInstance($("#messageBox")[0]).open()
-                });
+                    .done(function (d) {
+                        $("#messageBox").find("h4").html("Sucesso!");
+                        $("#messageBox").modal({ dismissible: false });
+                        $("#messageBox").find("p").html("Cadastro do produto realizado.<br>Redirecionando para a página principal...");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+
+                        setTimeout(function () { window.location.href = d.route; }, 2000);
+                    })
+                    .fail(function (d) {
+                        $("#messageBox").find("h4").html("Um erro ocorreu!");
+                        $("#messageBox").find("p").html("Não foi possível cadastrar o produto.<br>Verifique os dados e tente novamente.");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+                    })
+                    .always(function (d) {
+                        $(".loading").addClass("d-none");
+                    });
+            }
+            else {
+                $(".error-list").html("");
+                for (var i in errorList) {
+                    $(".error-list").append(`<p class='error-item text-danger'>${errorList[i].message}</p>`);
+                }
+            }
         });
     });
 </script>

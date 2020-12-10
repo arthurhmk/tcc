@@ -9,7 +9,7 @@
 
 <div class="row justify-content-md-center">
     <div class="col-12 col-sm-10 border rounded shadow-sm p-3">
-        <form asp-action="CadastroPedido" method="post">
+        <form asp-action="CadastroPedido" method="post" autocomplete="off">
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group">
@@ -63,18 +63,18 @@
             <div class="form-group">
                 <label>Pagamento</label><br />
                 <label class="mr-4 text-dark">
-                    <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PAGO)" 
-                           @{if (ControlProduct.Models.Enum.EstadoPedido.PAGO == Model.Estado) {@Html.Raw("checked") } } />
+                    <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PAGO)"
+                           @{if (ControlProduct.Models.Enum.EstadoPedido.PAGO == Model.Estado) { @Html.Raw("checked")  } } />
                     <span>Valor já pago</span>
                 </label>
                 <label class="text-dark">
                     <input class="with-gap" name="radioPagamento" type="radio" value="@((int)ControlProduct.Models.Enum.EstadoPedido.PENDENTE)"
-                           @{if (ControlProduct.Models.Enum.EstadoPedido.PENDENTE == Model.Estado) {@Html.Raw("checked") } } />
+                           @{if (ControlProduct.Models.Enum.EstadoPedido.PENDENTE == Model.Estado) { @Html.Raw("checked")  } } />
                     <span>Pagamento parcial</span>
                 </label>
-                @{ 
+                @{
                     double valorpago;
-                    if(Model.Pagamentos != null)
+                    if (Model.Pagamentos != null)
                     {
                         var pagamento = Model.Pagamentos.FirstOrDefault();
                         valorpago = pagamento == null ? 0 : pagamento.Valor;
@@ -82,7 +82,7 @@
                     else
                         valorpago = 0;
                 }
-                <input class="moneyMask pagamentoParcial ml-4" style="width:200px" type="text" name="Pagamentos[0].Valor" value="@valorpago" @{if (ControlProduct.Models.Enum.EstadoPedido.PENDENTE != Model.Estado) {@Html.Raw("disabled") } } />
+                <input class="moneyMask pagamentoParcial ml-4" style="width:200px" type="text" name="Pagamentos[0].Valor" value="@valorpago" @{if (ControlProduct.Models.Enum.EstadoPedido.PENDENTE != Model.Estado) { @Html.Raw("disabled")  } } />
             </div>
             <hr />
 
@@ -96,6 +96,8 @@
             {
                 <a asp-action="RemoverPedido" asp-route-idPedido="@Model.Id" class="btn btn-danger">Excluir</a>
             }
+
+            <div class="error-list pt-3"></div>
         </form>
     </div>
 </div>
@@ -191,6 +193,12 @@
     </div>
 </div>
 
+
+@section scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
 <script>
     var produtos = [];
     var produtosExtra = [];
@@ -253,38 +261,54 @@
 
         $("form").submit(function (e) {
             e.preventDefault();
-            let data = getFormData($(this));
-            data.pedidoProdutos = produtos.map(p => { return { IdProduto: p.id, Quantidade: p.qtde * 1 } });
-            data.extras = produtosExtra.map(p => { return { Id: p.id, Nome: p.nome, Valor: p.valor } });
-            if (data.ValorEntrega) {
-                data.ValorEntrega = data.ValorEntrega.split("$")[1] * 1;
-            }
-            if (data.radioPagamento) {
-                data.Estado = data.radioPagamento;
-            }
-            if (data["Pagamentos[0].Valor"]) {
-                data["Pagamentos[0].Valor"] = data["Pagamentos[0].Valor"].split("$")[1] * 1;
-            }
-            data.Valor = $(".precoTotal").eq(0).html().split("$")[1].replace(",",".") * 1;
-            console.log(data);
-            $.ajax({
-                url: $(this).attr("action"),
-                method: "post",
-                data: data
-            })
-                .done(function (d) {
-                    $("#messageBox").find("h4").html("Sucesso!");
-                    $("#messageBox").modal({ dismissible: false });
-                    $("#messageBox").find("p").html("Cadastro do pedido realizado.<br>Redirecionando para a página principal...");
-                    M.Modal.getInstance($("#messageBox")[0]).open()
+            $(this).validate().form();
+            var errorList = $(this).validate().errorList;
 
-                    setTimeout(function(){ window.location.href = d.route; }, 2000);
+            if (!errorList.length) {
+                let data = getFormData($(this));
+                $(".loading").removeClass("d-none");
+
+                data.pedidoProdutos = produtos.map(p => { return { IdProduto: p.id, Quantidade: p.qtde * 1 } });
+                data.extras = produtosExtra.map(p => { return { Id: p.id, Nome: p.nome, Valor: p.valor } });
+                if (data.ValorEntrega) {
+                    data.ValorEntrega = data.ValorEntrega.split("$")[1] * 1;
+                }
+                if (data.radioPagamento) {
+                    data.Estado = data.radioPagamento;
+                }
+                if (data["Pagamentos[0].Valor"]) {
+                    data["Pagamentos[0].Valor"] = data["Pagamentos[0].Valor"].split("$")[1] * 1;
+                }
+                data.Valor = $(".precoTotal").eq(0).html().split("$")[1].replace(",",".") * 1;
+                console.log(data);
+                $.ajax({
+                    url: $(this).attr("action"),
+                    method: "post",
+                    data: data
                 })
-                .fail(function (d) {
-                    $("#messageBox").find("h4").html("Um erro ocorreu!");
-                    $("#messageBox").find("p").html("Não foi possível cadastrar o pedido.<br>Verifique os dados e tente novamente.");
-                    M.Modal.getInstance($("#messageBox")[0]).open()
-                });
+                    .done(function (d) {
+                        $("#messageBox").find("h4").html("Sucesso!");
+                        $("#messageBox").modal({ dismissible: false });
+                        $("#messageBox").find("p").html("Cadastro do pedido realizado.<br>Redirecionando para a página principal...");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+
+                        setTimeout(function(){ window.location.href = d.route; }, 2000);
+                    })
+                    .fail(function (d) {
+                        $("#messageBox").find("h4").html("Um erro ocorreu!");
+                        $("#messageBox").find("p").html("Não foi possível cadastrar o pedido.<br>Verifique os dados e tente novamente.");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+                    })
+                    .always(function (d) {
+                        $(".loading").addClass("d-none");
+                    });
+            }
+            else {
+                $(".error-list").html("");
+                for (var i in errorList) {
+                    $(".error-list").append(`<p class='error-item text-danger'>${errorList[i].message}</p>`);
+                }
+            }
         });
 
 
