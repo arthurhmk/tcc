@@ -11,8 +11,8 @@ namespace ControlProduct.Models
 
         public int Id { get; set; }
         public DateTime Data { get; set; }
-        public decimal Entrada { get; set; }
-        public decimal Saida { get; set; }
-        public decimal Valor { get; set; }
+        public double Entrada { get; set; }
+        public double Saida { get; set; }
+        public double Valor { get; set; }
     }
 }

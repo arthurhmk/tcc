@@ -76,7 +76,7 @@ namespace ControlProduct.Controllers
                     );
                 });
 
-                debito.Entrada = (decimal)listaPedidoExtra.Sum();
+                debito.Entrada = listaPedidoExtra.Sum();
 
                 if (debito.Id != 0)
                     await _repoDebito.Update(debito);

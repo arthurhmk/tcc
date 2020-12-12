@@ -11,15 +11,15 @@ namespace ControlProduct.Models.ViewModel
             Entrada = deb.Entrada;
             Saida = deb.Saida;
             Valor = deb.Valor;
-            Total = ((Entrada - Saida) < 0?"- ":"") + "R$" +Math.Abs(Entrada - Saida).ToString();
+            Total = ((Entrada - Saida) < 0?"- ":"") + "R$" +Math.Abs(Entrada - Saida).ToString("F");
         }
 
 
         public int Id { get; set; }
         public string Data { get; set; }
-        public decimal Entrada { get; set; }
-        public decimal Saida { get; set; }
-        public decimal Valor { get; set; }
+        public double Entrada { get; set; }
+        public double Saida { get; set; }
+        public double Valor { get; set; }
         public string Total { get; set; }
     }
 }

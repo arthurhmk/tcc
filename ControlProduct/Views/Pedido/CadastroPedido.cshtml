@@ -269,6 +269,10 @@
             $("#IdCliente").siblings("input").attr('data-val-required', $("#IdCliente").attr('data-val-required'));
             $("#IdCliente").siblings("input").validate()
             $("#IdCliente").siblings("input").rules('add', $("#IdCliente").rules());
+            
+            $("input").each(function () {
+                $(this).rules('remove', 'number');
+            });
         }, 1000);
 
         updateTotal();

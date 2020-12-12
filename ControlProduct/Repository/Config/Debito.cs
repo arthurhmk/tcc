@@ -22,16 +22,28 @@ namespace ControlProduct.Repository.Config
 
             builder
                 .Property(p => p.Entrada)
-                .HasColumnName("vl_entrada");
+                .HasColumnName("vl_entrada")
+                .HasConversion(
+                    p => (decimal)p,
+                    p => decimal.ToDouble(p)
+                );
 
 
             builder
                 .Property(p => p.Saida)
-                .HasColumnName("vl_saida");
+                .HasColumnName("vl_saida")
+                .HasConversion(
+                    p => (decimal)p,
+                    p => decimal.ToDouble(p)
+                );
 
             builder
                 .Property(p => p.Valor)
-                .HasColumnName("vl_debito");
+                .HasColumnName("vl_debito")
+                .HasConversion(
+                    p => (decimal)p,
+                    p => decimal.ToDouble(p)
+                );
         }
     }
 }
