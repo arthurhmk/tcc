@@ -17,11 +17,14 @@ namespace ControlProduct.Controllers
     public class CategoriaController : BaseController
     {
         BaseRepository<Categoria> _repoCategoria;
+        BaseRepository<Produto> _repoProduto;
         public CategoriaController(BaseServices serv, 
-            BaseRepository<Categoria> repoCategoria)
+            BaseRepository<Categoria> repoCategoria,
+            BaseRepository<Produto> repoProduto)
             :base(serv)
         {
             _repoCategoria = repoCategoria;
+            _repoProduto = repoProduto;
         }
 
         [Route("")]
@@ -39,9 +42,9 @@ namespace ControlProduct.Controllers
 
             if(idCategoria != null)
             {
-                var categoria = await _repoCategoria.Entity.FindAsync(idCategoria);
-                if (categoria != null)
-                    return View(categoria);
+                var categoria = await _repoCategoria.Entity.AsNoTracking().Where(p=>p.Id==idCategoria.GetValueOrDefault()).Include(p=>p.Produtos).ToListAsync();
+                if (categoria.Any())
+                    return View(categoria.First());
             }
             return View(new Categoria());
         }
@@ -52,10 +55,22 @@ namespace ControlProduct.Controllers
         {
             if (ModelState.IsValid)
             {
+                var produtos = new List<Produto>();
+                if(categoria.Produtos != null && categoria.Produtos.Any())
+                    produtos = await _repoProduto.Entity.AsNoTracking().Where(p => categoria.Produtos.Select(q => q.Id).Contains(p.Id)).ToListAsync();
+                categoria.Produtos = null;
+
                 if (categoria.Id != 0)
                     await _repoCategoria.Update(categoria);
                 else
                     await _repoCategoria.Insert(categoria);
+
+
+                foreach (var produto in produtos)
+                {
+                    produto.CategoriaId = categoria.Id;
+                    await _repoProduto.Update(produto);
+                }
                 return Json(new { route = "/categoria" });
             }
 
@@ -71,7 +86,7 @@ namespace ControlProduct.Controllers
                 if (categoria != null)
                 {
                     await _repoCategoria.Delete(categoria);
-                    return RedirectToAction(nameof(Index));
+                    return Json(new { route = "/categoria" });
                 }
             }
 

@@ -68,7 +68,7 @@ namespace ControlProduct.Controllers
                 if (cliente != null)
                 {
                     await _repoCliente.Delete(cliente);
-                    return RedirectToAction(nameof(Index));
+                    return Json(new { route = "/cliente" });
                 }
             }
             throw new Exception("Cliente inválido");

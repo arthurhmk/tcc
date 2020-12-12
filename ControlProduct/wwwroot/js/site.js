@@ -71,4 +71,17 @@ function setMoneyMask() {
         'prefix': 'R$',
         'placeholder': '0'
     });
+
+    $(".moneyMaskNeg").inputmask('decimal', {
+        'rightAlign': false,
+        'alias': 'numeric',
+        'groupSeparator': '',
+        'autoGroup': true,
+        'digits': 2,
+        'radixPoint': ".",
+        'digitsOptional': false,
+        'allowMinus': true,
+        'prefix': 'R$',
+        'placeholder': '0'
+    });
 }

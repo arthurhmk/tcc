@@ -100,5 +100,12 @@
                 }
             }
         });
+
+        $("form").find(".btn-danger").click(function (e) {
+            e.preventDefault();
+
+            $("#modalExclusao").find(".btn-danger").attr("href", $("form").find(".btn-danger").attr("href"));
+            M.Modal.getInstance($("#modalExclusao")[0]).open()
+        });
     });
 </script>

@@ -14,7 +14,7 @@
 
             <div class="form-group">
                 <label asp-for="Saida">Investimentos</label>
-                <input asp-for="Saida" class="form-control currency" type="number" />
+                <input asp-for="Saida" class="form-control moneyMask" type="text" />
             </div>
 
             <div class="form-group">
@@ -28,7 +28,51 @@
                 <a asp-action="RemoverDebito" asp-route-idDebito="@Model.Id" class="btn btn-danger">Excluir</a>
             }
 
+            <div class="error-list pt-3"></div>
         </form>
     </div>
 </div>
 
+<script>
+    window.addEventListener("load", function () {
+        $(".modal").modal();
+        setMoneyMask();
+
+        $("form").submit(function (e) {
+            e.preventDefault();
+            let data = getFormData($(this));
+
+            data.Saida = data.Saida.split("$")[1]*1;
+
+            $(".loading").removeClass("d-none");
+            $.ajax({
+                url: $(this).attr("action"),
+                method: "post",
+                data: data
+            })
+                .done(function (d) {
+                    $("#messageBox").find("h4").html("Sucesso!");
+                    $("#messageBox").modal({ dismissible: false });
+                    $("#messageBox").find("p").html("Categoria registrada com sucesso.<br>Redirecionando para a página principal...");
+                    M.Modal.getInstance($("#messageBox")[0]).open()
+
+                    setTimeout(function () { window.location.href = d.route; }, 2000);
+                })
+                .fail(function (d) {
+                    $("#messageBox").find("h4").html("Um erro ocorreu!");
+                    $("#messageBox").find("p").html("Não foi possível registrar a categoria.<br>Verifique os dados e tente novamente.");
+                    M.Modal.getInstance($("#messageBox")[0]).open()
+                })
+                .always(function (d) {
+                    $(".loading").addClass("d-none");
+                });
+        });
+
+        $("form").find(".btn-danger").click(function (e) {
+            e.preventDefault();
+
+            $("#modalExclusao").find(".btn-danger").attr("href", $("form").find(".btn-danger").attr("href"));
+            M.Modal.getInstance($("#modalExclusao")[0]).open()
+        });
+    });
+</script>

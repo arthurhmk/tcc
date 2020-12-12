@@ -82,6 +82,19 @@
         <p class="text-muted"></p>
     </div>
 
+    <div class="modal p-4" id="modalExclusao">
+        <h4>Tem certeza que deseja excluir esse registro?</h4>
+        <div class="row align-content-between mt-5">
+            <div class="col text-center">
+                <button class="btn btn-outline-primary" style="cursor:pointer" onclick="fecharModalExclusao()">Cancelar</button>
+            </div>
+            <div class="col text-center">
+                <a class="btn btn-danger" href="#">Excluir</a>
+            </div>
+        </div>
+        <p class="text-muted"></p>
+    </div>
+
     @*<footer class="border-top footer text-muted">
             <div class="container">
                 &copy; 2020 - ControlProduct - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -96,5 +109,39 @@
     <script src="~/lib/js-cookie/js-cookie.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
+    <script>
+        $(document).ready(function () {
+
+            $("#modalExclusao").find(".btn-danger").click(function (e) {
+                e.preventDefault();
+                fecharModalExclusao();
+                $(".loading").removeClass("d-none");
+                $.ajax({
+                    url: $(this).attr("href"),
+                    method: "post"
+                })
+                    .done(function (d) {
+                        $("#messageBox").find("h4").html("Sucesso!");
+                        $("#messageBox").modal({ dismissible: false });
+                        $("#messageBox").find("p").html("Registro excluído com sucesso.<br>Redirecionando para a página principal...");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+
+                        setTimeout(function () { window.location.href = d.route; }, 2000);
+                    })
+                    .fail(function (d) {
+                        $("#messageBox").find("h4").html("Um erro ocorreu!");
+                        $("#messageBox").find("p").html("Não foi possível apagar o registro.<br>Tente novamente mais tarde.");
+                        M.Modal.getInstance($("#messageBox")[0]).open()
+                    })
+                    .always(function (d) {
+                        $(".loading").addClass("d-none");
+                    });
+            });
+        });
+
+        function fecharModalExclusao() {
+            M.Modal.getInstance($("#modalExclusao")[0]).close();
+        }
+    </script>
 </body>
 </html>

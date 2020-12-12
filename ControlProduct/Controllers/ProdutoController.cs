@@ -84,7 +84,7 @@ namespace ControlProduct.Controllers
                 if (produto != null)
                 {
                     await _repoProduto.Delete(produto);
-                    return RedirectToAction(nameof(Index));
+                    return Json(new { route = "/produto" });
                 }
             }
 

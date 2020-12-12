@@ -89,7 +89,7 @@ body {
     width:80%;
 }
     .custom-modal > .row {
-        min-height: 500px;
+        min-height: 420px;
         margin: 0;
     }
 .produto-modal-bottom-row{
@@ -187,4 +187,8 @@ table{
     bottom:32px;
     left:-2px;
     background-color:white;
+}
+
+.btn{
+    height:100%;
 }

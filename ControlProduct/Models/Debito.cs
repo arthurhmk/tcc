@@ -4,6 +4,11 @@ namespace ControlProduct.Models
 {
     public class Debito
     {
+        public Debito()
+        {
+            Data = DateTime.Now;
+        }
+
         public int Id { get; set; }
         public DateTime Data { get; set; }
         public decimal Entrada { get; set; }

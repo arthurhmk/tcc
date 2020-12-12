@@ -1,4 +1,4 @@
-﻿@model List<Debito>
+﻿@model List<ControlProduct.Models.ViewModel.DebitoViewModel>
 @{
     ViewData["Title"] = "Débitos";
 }
@@ -28,13 +28,10 @@
                 {
                     <tr>
                         <td>@debito.Data</td>
-                        <td>@debito.Entrada</td>
-                        <td>@debito.Saida</td>
+                        <td class="moneyMask">@debito.Entrada</td>
+                        <td class="moneyMask">@debito.Saida</td>
                         <td>
-                            @{
-                                var saldo = debito.Entrada - debito.Saida;
-                             }
-                            @saldo
+                            @debito.Total
                         </td>
                         <td>
                             <a asp-action="CadastroDebito" asp-route-idDebito="@debito.Id">
@@ -49,3 +46,23 @@
         </table>
     </div>
 </div>
+
+<script>
+    var DataTableConfig = {
+        columnDefs: [
+            {
+                targets: [4],
+                orderable: false,
+                searchable: false
+            }
+        ]
+    }
+</script>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            setMoneyMask();
+        });
+    </script>
+}

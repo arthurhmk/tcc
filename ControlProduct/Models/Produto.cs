@@ -13,7 +13,7 @@ namespace ControlProduct.Models
         [DisplayName("Categoria do Produto")]
         public int CategoriaId { get; set; }
 
-        [Required(ErrorMessage ="Esse campo é obrigatório.")]
+        [Required(ErrorMessage ="Insira o nome do produto.")]
         [DisplayName("Nome do Produto")]
         public string Nome { get; set; }
 

@@ -17,7 +17,7 @@ namespace ControlProduct.Models
 
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Esse campo é obrigatório.")]
+        [Required(ErrorMessage = "Selecione um cliente.")]
         [DisplayName("Nome do Cliente")]
         public int IdCliente { get; set; }
 
@@ -27,7 +27,9 @@ namespace ControlProduct.Models
 
         public DateTime DataPedido{ get; set; }
 
-        [Required(ErrorMessage = "Esse campo é obrigatório.")]
+        [Required(ErrorMessage = "Insira uma data de entrega.")]
+        [Range(typeof(DateTime),"1/1/2000", "1/1/2100",
+        ErrorMessage = "Insira uma data de entrega válida")]
         [DisplayName("Data de Entrega")]
         public DateTime DataEntrega { get; set; }
 

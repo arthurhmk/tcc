@@ -35,7 +35,8 @@ namespace ControlProduct.Controllers
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            var debitos =  await _repoDebito.Entity.AsNoTracking().OrderBy(p=> p.Data).ToListAsync();
+            var debitos =  (await _repoDebito.Entity.AsNoTracking().OrderBy(p=> p.Data).ToListAsync())
+                .Select(p=> new DebitoViewModel(p)).ToList();
             return View(debitos);
         }
 
@@ -81,7 +82,7 @@ namespace ControlProduct.Controllers
                     await _repoDebito.Update(debito);
                 else
                     await _repoDebito.Insert(debito);
-                return RedirectToAction(nameof(Index));
+                return Json(new { route = "/debito" });
             }
 
             throw new Exception("Débito inválido");
@@ -96,7 +97,7 @@ namespace ControlProduct.Controllers
                 if (debito != null)
                 {
                     await _repoDebito.Delete(debito);
-                    return RedirectToAction(nameof(Index));
+                    return Json(new { route = "/debito" });
                 }
             }
 

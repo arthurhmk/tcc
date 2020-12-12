@@ -50,9 +50,9 @@
                     @for (var i = 0; i < categorias.Count; i++)
                     {
                         <div class="col-4 categoriaButton collapsed p-1" data-toggle="collapse" data-target="#cat@(i)" aria-expanded="false" aria-controls="cat@(i)">
-                            <span class="btn btn-outline-primary w-100">
+                            <button class="btn btn-outline-primary w-100">
                                 @categorias[i].Nome
-                            </span>
+                            </button>
                         </div>
 
                         <div id="cat@(i)" class="collapse collapsed col-12 produtosList" data-parent="#categoriasList">
@@ -84,7 +84,7 @@
             <h4>Produtos da categoria</h4>
 
             <div id="listaProduto">
-                <div class="row produto">
+                <div class="row produtoCat">
                     <div class="col-12 col-xl-6 d-flex">
                         <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x-circle-fill produto-remove-button" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
@@ -105,6 +105,17 @@
     var produtos = []
     window.addEventListener("load", function () {
         $('.modal').modal();
+        
+        produtoCat = $(".produtoCat");
+        produtoCat.remove();
+
+        $(".categoriaButton").on('click', function () {
+            $('.categoriaButton').removeClass('col-12').addClass('col-4')
+
+            if ($(this).hasClass('collapsed')) {
+                $(this).removeClass('col-4').addClass('col-12')
+            }
+        });
 
         $("form").submit(function (e) {
             e.preventDefault();
@@ -113,6 +124,7 @@
 
             if (!errorList.length) {
                 let data = getFormData($(this));
+                data.produtos = produtos.map(p => { return { Id: p.id, Nome: p.nome } });
                 $(".loading").removeClass("d-none");
                 $.ajax({
                     url: $(this).attr("action"),
@@ -143,6 +155,25 @@
                 }
             }
         });
+
+        $("form").find(".btn-danger").click(function (e) {
+            e.preventDefault();
+
+            $("#modalExclusao").find(".btn-danger").attr("href", $("form").find(".btn-danger").attr("href"));
+            M.Modal.getInstance($("#modalExclusao")[0]).open()
+        });
+
+        
+
+        @{
+            if (Model.Produtos != null)
+            {
+                foreach (var produto in Model.Produtos)
+                {
+                    @Html.Raw($"addUnremovableProduto({produto.Id},'{produto.Nome}');");
+                }
+            }
+        }
     });
 
 
@@ -150,18 +181,26 @@
         if (!produtos.filter(p => p.id == id).length) {
             produtos.push({ "id": id, "nome": nome })
 
-            //let newPedidoProduto = produtoPedido.clone();
-            //$(newPedidoProduto).attr("id","pedidoProduto" + id);
-            //$(newPedidoProduto).find("svg").click(function () {
-            //    removeProduto(id)
-            //});
-            //$(newPedidoProduto).find(".produtoPedidoDesc").html(prodDesc(nome, valor))
-            //$(newPedidoProduto).find(".produtoPedidoQtde").val(qtde);
-            //$(newPedidoProduto).find(".produtoPedidoQtde").change(function () {
-            //    changeQtde(id, $(this).val())
-            //});
+            let newProdutoCat = produtoCat.clone();
+            $(newProdutoCat).attr("id","produtoCat" + id);
+            $(newProdutoCat).find("svg").click(function () {
+                removeProduto(id)
+            });
+            $(newProdutoCat).find(".produtoDesc").html(nome);
 
-            //$("#listaProdutoPedido").append(newPedidoProduto);
+            $("#listaProduto").append(newProdutoCat);
+        }
+    }
+
+    function addUnremovableProduto(id, nome) {
+        if (!produtos.filter(p => p.id == id).length) {
+
+            let newProdutoCat = produtoCat.clone();
+            $(newProdutoCat).attr("id", "produtoCat" + id);
+            $(newProdutoCat).find("svg").remove();
+            $(newProdutoCat).find(".produtoDesc").html(nome);
+
+            $("#listaProduto").append(newProdutoCat);
         }
     }
 
@@ -169,7 +208,7 @@
         let remover = produtos.filter(p => p.id == id);
         if (remover.length) {
             produtos.splice(produtos.indexOf(remover[0]), 1);
-            //$("#pedidoProduto" + id).remove();
+            $("#produtoCat" + id).remove();
         }
         updateTotal();
     }

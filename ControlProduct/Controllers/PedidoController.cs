@@ -217,7 +217,7 @@ namespace ControlProduct.Controllers
                     }
 
                     await _repoPedido.Delete(pedido.First());
-                    return RedirectToAction(nameof(Index));
+                    return Json(new { route = "/" });
                 }
             }
 
