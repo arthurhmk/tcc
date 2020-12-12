@@ -224,6 +224,12 @@
                     setMoneyMask();
                     updateTotal();
                     setEnderecoCliente();
+                    
+                    setTimeout(function () {
+                        $("input").each(function () {
+                            $(this).rules('remove', 'number');
+                        });
+                    }, 1000);
                 }
                 else {
                     formularioEntrega.remove();
